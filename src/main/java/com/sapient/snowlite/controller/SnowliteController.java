@@ -3,6 +3,8 @@ package com.sapient.snowlite.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,11 @@ public class SnowliteController {
 	private SnowliteService snowliteService;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String welcome(ModelMap model) {
+	public String welcome(ModelMap model, HttpServletRequest request) {
 
 		logger.info("Fetching available operations...");
+		String reqUser = request.getRemoteUser();
+		System.out.println(reqUser);
 		String userId = "ssh150";
 		Map<String, List<Operation>> operations = snowliteService.getUserOperations(userId);
 		model.addAllAttributes(operations);
