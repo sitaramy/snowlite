@@ -3,6 +3,8 @@ package com.sapient.snowlite.service;
 import java.util.List;
 import java.util.Map;
 
+import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
 import com.sapient.snowlite.model.User;
 
@@ -39,4 +41,23 @@ public interface SnowliteService {
 	 * @return
 	 */
 	Map<String, List<Operation>> getUserOperations(String userId);
+	
+	/**
+	 * Gets the available business services
+	 * @return
+	 */
+	List<BusinessService> getBusinessServices();
+	
+	/**
+	 * Save an incident
+	 * @param incident
+	 */
+	void saveIncident(Incident incident);
+	
+	/**
+	 * Get incidents raised by user
+	 * @param userId
+	 * @return
+	 */
+	List<Incident> getIncidents(String userId);
 }

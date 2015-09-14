@@ -24,6 +24,7 @@
 	
 	<!-- jQuery -->
     <script src="js/jquery.js"></script>
+    <script src="js/snowlite.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
@@ -103,7 +104,8 @@
 	
 	<script>
 		
-		var sections = ["#myIncidents", "#newIncident", "#createDBR", "#bridgeRequest", "#awsNonProdDeploy", "#approveIncidents"];
+		var sections = ["#myIncidents", "#newIncident", "#createDBR", "#bridgeRequest", "#awsNonProdDeploy", "#sudoAccess", "#newDatabaseRelease", 
+		                "#sharedFolderAccess", "#unixAccount", "#pendingItems"];
 	
 		function doOnLoad() {
 		  setScreenSize(400,600);
@@ -118,6 +120,7 @@
 		  var snlOptions = $('#snl-option').selectric();
 		  $('#snl-option').val("myIncidents").selectric('refresh');
 		  $("#myIncidents").show();
+		  doOperation("#myIncidents");
 		  
 		  //Dropdown on change
 		  snlOptions.on('change', function() {
@@ -128,16 +131,13 @@
 				  $(sections[idx]).hide();
 			  }
 			  $(selectedSection).show();
+			  doOperation(selectedSection);
 		  });
 		  
 		}
 		
-		function doWindowResize(){
-		  setScreenSize(400,600);
-		}
-		
-		function setScreenSize(w,h){
-		  window.resizeTo(w,h);
+		function populateEnvironment(elementId, value){
+			 $('#' + elementId).val(value);
 		}
 		
 </script>
@@ -160,6 +160,10 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="#">Service Now Lite</a>
+                <div class="pull-right" style="margin-top: 15px; margin-right: 2px;">
+				  	<span style="color:white">${loggedInUser.name}</span>
+			  	</div>
+			  	<div class="clearfix"></div>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -214,170 +218,328 @@
 			
 			<!-- New incidents -->
 			<div class="row" id="newIncident" style="display:none;">
-				<div class="col-xs-12 col-sm-12">			
-					<h5>Create a new incident</h5>
-					<table class="table">
-						<tbody>
-							<tr>
-								<td><label>Assignment Group</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="assignmentGroupNI" id="assignmentGroupNI" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Short Description</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="shortDescriptionNI" id="shortDescriptionNI" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Description</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="descriptionNI" id="descriptionNI" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align:center">
-									<button class="btn btn-primary">Submit</button>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="col-xs-12 col-sm-12">	
+					<form id="newIncidentForm">		
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><label>Requested For</label></td>
+									<td>
+										<div class="form-group">
+											<input type="text" name="incRequestedFor" id="incRequestedFor" value="${loggedInUser.name}" class="form-control" onblur="validateNewIncident()"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Environment</label></td>
+									<td>
+										<div class="btn-toolbar">
+											<div class="btn-group">
+									              <button type="button" onclick="populateEnvironment('incEnvironment', 'Test')" data-switch-set="incEnv" data-switch-value="Test" class="btn btn-default">Test</button>
+									              <button type="button" onclick="populateEnvironment('incEnvironment', 'Stage')" data-switch-set="incEnv" data-switch-value="Stage" class="btn btn-default">Stage</button>
+									              <button type="button" onclick="populateEnvironment('incEnvironment', 'Prod')" data-switch-set="incEnv" data-switch-value="Prod" class="btn btn-default">Prod</button>
+								            </div>
+										</div>
+										<input type="hidden" id="incEnvironment" name="incEnvironment"/>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Description</label></td>
+									<td>
+										<div class="form-group">
+											<textarea name="incDescription" id="incDescription" rows="2" class="form-control"  onblur="validateNewIncident()"></textarea>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Business Service</label></td>
+									<td>
+										<div class="form-group">
+											<select id="incBusinessService" name="incBusinessService" class="form-control" onchange="validateNewIncident()">
+												<c:forEach items="${businessServices}" var="bs"> 
+													<option value="${bs.serviceId}">${bs.serviceName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align:center">
+										<button type="button" id="newIncidentButton" class="btn btn-primary disabled" onclick="saveNewIncident()">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
 				</div>
 			</div>
 			
-			<!-- Bridge Request -->
-			<div class="row" id="bridgeRequest" style="display:none;">
-				<div class="col-xs-12 col-sm-12">			
-					<h5>Open a bridge request to discuss production issues</h5>
-					<table class="table">
-						<tbody>
-							<tr>
-								<td><label>Incident</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="incidentBR" id="incidentBR" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Description</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="descriptionBR" id="descriptionBR" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Requested People</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="requestedPeopleBR" id="requestedPeopleBR" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align:center">
-									<button class="btn btn-primary">Submit</button>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+			<!-- New Database Release -->
+			<div class="row" id="newDatabaseRelease" style="display:none;">
+				<div class="col-xs-12 col-sm-12">	
+					<form id="newDBRelForm">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><label>Application</label></td>
+									<td>
+										<div class="form-group">
+											<select id="dbRelApplication" name="dbRelApplication" class="form-control">
+											</select>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Description</label></td>
+									<td>
+										<div class="form-group">
+											<textarea name="dbRelDescription" id="dbRelDescription" rows="2" class="form-control"></textarea>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align:center">
+										<button id="newDBRelButton" type="button" class="btn btn-primary disabled">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
 				</div>
 			</div>
 			
 			<!-- Create DBR -->
 			<div class="row" id="createDBR" style="display:none;">
 				<div class="col-xs-12 col-sm-12">			
-					<h5>Raise DBR to get help in Database operations</h5>
-					<table class="table">
-						<tbody>
-							<tr>
-								<td><label>Environment</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="environmentDBR" id="environmentDBR" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Short Description</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="shortDescriptionDBR" id="shortDescriptionDBR" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Assignment Group</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="assignmentGroupDBR" id="assignmentGroupDBR" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align:center">
-									<button class="btn btn-primary">Submit</button>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+					<form id="dbrForm">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><label>Release</label></td>
+									<td>
+										<div class="form-group">
+											<select id="dbrRelease" name="dbrRelease" class="form-control">
+											</select>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Environment</label></td>
+									<td>
+										<div class="btn-toolbar">
+											<div class="btn-group">
+									              <button type="button" onclick="populateEnvironment('dbrEnvironment', 'Test')" data-switch-set="dbrEnv" data-switch-value="Test" class="btn btn-default">Test</button>
+									              <button type="button" onclick="populateEnvironment('dbrEnvironment', 'Stage')" data-switch-set="dbrEnv" data-switch-value="Stage" class="btn btn-default">Stage</button>
+									              <button type="button" onclick="populateEnvironment('dbrEnvironment', 'Prod')" data-switch-set="dbrEnv" data-switch-value="Prod" class="btn btn-default">Prod</button>
+								            </div>
+										</div>
+										<input type="hidden" id="dbrEnvironment" name="dbrEnvironment"/>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Description</label></td>
+									<td>
+										<div class="form-group">
+											<textarea name="dbrDescription" id="dbrDescription" rows="2" class="form-control"></textarea>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align:center">
+										<button type="button" id="dbrButton" class="btn btn-primary disabled">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
 				</div>
 			</div>
 			
-			<!-- Approve incidents -->
-			<div class="row" id="approveIncidents" style="display:none;">
-				<div class="col-xs-12 col-sm-12">	
-				
+			<!-- Bridge Request -->
+			<div class="row" id="bridgeRequest" style="display:none;">
+				<div class="col-xs-12 col-sm-12">			
+					<form id="bridgeReqForm">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><label>Incident</label></td>
+									<td>
+										<div class="form-group">
+											<select id="brIncident" name="brIncident" class="form-control">
+											</select>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Reason</label></td>
+									<td>
+										<div class="form-group">
+											<textarea name="brReason" id="brReason" rows="2" class="form-control"></textarea>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Requested People</label></td>
+									<td>
+										<div class="form-group">
+											<textarea name="brRequestedPeople" id="brRequestedPeople" rows="2" class="form-control"></textarea>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align:center">
+										<button type="button" id="brButton" class="btn btn-primary disabled">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
 				</div>
-			</div>	
+			</div>
 			
 			<!-- AWS Non Prod Deployment -->
 			<div class="row" id="awsNonProdDeploy" style="display:none;">
 				<div class="col-xs-12 col-sm-12">			
-					<h5>Deploy infrastructure and application to Virtual Private Cloud</h5>
-					<table class="table">
-						<tbody>
-							<tr>
-								<td><label>VPC Name</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="vpcNameAWS" id="vpcNameAWS" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>App Stack</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="applicationStackAWS" id="applicationStackAWS" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Path of archive</label></td>
-								<td>
-									<div class="form-group">
-										<input type="text" name="pathOfArchiveAWS" id="pathOfArchiveAWS" class="form-control"/>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align:center">
-									<button class="btn btn-primary">Submit</button>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+					<form id="awsDeploymentForm">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><label>VPC Name</label></td>
+									<td>
+										<div class="form-group">
+											<input type="text" name="vpcNameAWS" id="vpcNameAWS" class="form-control"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>App Stack</label></td>
+									<td>
+										<div class="form-group">
+											<input type="text" name="applicationStackAWS" id="applicationStackAWS" class="form-control"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Path of Archive</label></td>
+									<td>
+										<div class="form-group">
+											<input type="text" name="pathOfArchiveAWS" id="pathOfArchiveAWS" class="form-control"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align:center">
+										<button type="button" id="awsButton" class="btn btn-primary disabled">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
 				</div>
 			</div>
+			
+			<!-- New Change request -->
+			<div class="row" id="sudoAccess" style="display:none;">
+				<div class="col-xs-12 col-sm-12">			
+					<form id="sudoAccessForm">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><label>Unix Id</label></td>
+									<td>
+										<div class="form-group">
+											<input type="text" name="saUnixId" id="saUnixId" class="form-control"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Admin Group Name</label></td>
+									<td>
+										<div class="form-group">
+											<input type="text" name="saAdminGroup" id="saAdminGroup" class="form-control"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align:center">
+										<button type="button" id="crButton" class="btn btn-primary disabled">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<!-- Shared folder access -->
+			<div class="row" id="sharedFolderAccess" style="display:none;">
+				<div class="col-xs-12 col-sm-12">			
+					<form id="sharedFolderAccessForm">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><label>Description</label></td>
+									<td>
+										<div class="form-group">
+											<textarea name="sfDescription" id="sfDescription" rows="2" class="form-control"></textarea>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Access Type</label></td>
+									<td>
+										<div class="form-group">
+											<select id="sfAccessType" name="sfAccessType" class="form-control">
+												<option value="Read">Read</option>
+												<option value="Write">Write</option>
+												<option value="Delete">delete</option>
+											</select>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align:center">
+										<button type="button" id="sfButton" class="btn btn-primary disabled">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<!-- unix Account -->
+			<div class="row" id="unixAccount" style="display:none;">
+				<div class="col-xs-12 col-sm-12">			
+					<form id="unixAccountForm">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td>
+										<label>Please click submit to raise a request for UNIX account.</label>
+									</td>
+								</tr>
+								<tr>
+									<td style="text-align:center">
+										<button type="button" id="unixButton" class="btn btn-primary">Submit</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<!-- Approve incidents -->
+			<div class="row" id="pendingItems" style="display:none;">
+				<div class="col-xs-12 col-sm-12">	
+					<ul class="nav nav-tabs">
+				    	<li class="active"><a href="#">Change Request</a></li>
+					    <li><a href="#">Other Requests</a></li>
+				  </ul>
+				</div>
+			</div>	
+			
 			
 		</div>
 	</div>

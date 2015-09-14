@@ -9,6 +9,7 @@ public final class User implements Serializable{
 	private String userId;
 	private String name;
 	private String email;
+	private Team team;
 	
 	public String getUserId() {
 		return userId;
@@ -28,5 +29,10 @@ public final class User implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+	public Team getTeam() {
+		return team;
+	}
+	public void setTeam(Team team) {
+		this.team = team;
+	}
 }

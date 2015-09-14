@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sapient.snowlite.dao.SnowliteDAO;
+import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
 import com.sapient.snowlite.model.User;
 
@@ -61,6 +63,21 @@ public class SnowliteServiceImpl implements SnowliteService {
 		operationsMap.put("preferredOperations", frequentlyUsedOperations);
 		
 		return operationsMap;
+	}
+
+	@Override
+	public List<BusinessService> getBusinessServices() {
+		return snowliteDAO.getBusinessServices();
+	}
+
+	@Override
+	public List<Incident> getIncidents(String userId) {
+		return snowliteDAO.getIncidents(userId);
+	}
+
+	@Override
+	public void saveIncident(Incident incident) {
+		snowliteDAO.saveIncident(incident);
 	}
 
 

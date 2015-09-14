@@ -3,8 +3,32 @@ DROP TABLE SN_USER;
 
 CREATE TABLE SN_USER (
   user_id  VARCHAR(10) PRIMARY KEY,
-  name VARCHAR(30),
-  email  VARCHAR(50)
+  name VARCHAR(50),
+  email  VARCHAR(50),
+  team_id VARCHAR(10)
+);
+
+-- Team
+DROP TABLE SN_TEAM;
+
+CREATE TABLE SN_TEAM (
+  team_id  VARCHAR(10) PRIMARY KEY,
+  team_name VARCHAR(30),
+  assignment_group VARCHAR(50),
+  approval_manager VARCHAR(10),
+  team_dl VARCHAR(20),
+  team_dev_dl VARCHAR(20),
+  team_qa_dl VARCHAR(20),
+  db_assignment_group VARCHAR(100)
+);
+
+-- Business Service
+DROP TABLE SN_BUSINESS_SVC;
+
+CREATE TABLE SN_BUSINESS_SVC(
+	business_svc_id INTEGER PRIMARY KEY,
+	business_service VARCHAR(100),
+	assignment_group VARCHAR(100)
 );
 
 -- Distribution list
@@ -48,4 +72,18 @@ CREATE TABLE SN_USER_OPERATIONS (
   operation_id INTEGER,
   user_id  VARCHAR(10),
   access_date TIMESTAMP
+);
+
+-- incidents
+DROP TABLE SN_INCIDENT;
+
+CREATE TABLE SN_INCIDENT(
+	incident_id	INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1000, INCREMENT BY 1),
+	short_description VARCHAR(2000),
+	description VARCHAR(4000),
+	requested_for VARCHAR(100),
+	environment VARCHAR(10),
+	business_service VARCHAR(100),
+	assignment_group VARCHAR(100),
+	user_id VARCHAR(10)
 );

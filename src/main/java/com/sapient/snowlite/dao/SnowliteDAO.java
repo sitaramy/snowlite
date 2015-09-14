@@ -2,6 +2,8 @@ package com.sapient.snowlite.dao;
 
 import java.util.List;
 
+import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
 import com.sapient.snowlite.model.User;
 
@@ -26,5 +28,24 @@ public interface SnowliteDAO {
 	 * @return
 	 */
 	List<Integer> getFrequentlyUsedOperations(String userId);
+	
+	/**
+	 * Gets the available business services
+	 * @return
+	 */
+	List<BusinessService> getBusinessServices();
+	
+	/**
+	 * Save an incident
+	 * @param incident
+	 */
+	void saveIncident(Incident incident);
+	
+	/**
+	 * Get incidents raised by user
+	 * @param userId
+	 * @return
+	 */
+	List<Incident> getIncidents(String userId);
 	
 }
