@@ -87,3 +87,17 @@ CREATE TABLE SN_INCIDENT(
 	assignment_group VARCHAR(100),
 	user_id VARCHAR(10)
 );
+
+-- Request
+DROP TABLE SN_REQUEST;
+
+CREATE TABLE SN_REQUEST (
+  request_id INTEGER PRIMARY KEY,
+  short_description VARCHAR(1000),
+  description  VARCHAR(3000),
+  user_id VARCHAR(10),
+  assignment_group varchar(100),
+  requested_resource varchar(1000),
+  approval char(1),
+  approving_manager varchar(10)
+);

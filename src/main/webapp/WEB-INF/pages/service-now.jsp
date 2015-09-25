@@ -212,7 +212,10 @@
 			<!-- My incidents -->
 			<div class="row" id="myIncidents" style="display:none;">
 				<div class="col-xs-12 col-sm-12">			
-					
+					<ul class="nav nav-tabs">
+				    	<li class="active"><a href="#">Requests for Approval</a></li>
+					    <li><a href="#">Incidents</a></li>
+				  </ul>
 				</div>
 			</div>
 			
