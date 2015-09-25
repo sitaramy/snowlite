@@ -16,8 +16,10 @@ import org.springframework.stereotype.Repository;
 import com.sapient.snowlite.model.BusinessService;
 import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
+import com.sapient.snowlite.model.Request;
 import com.sapient.snowlite.model.Team;
 import com.sapient.snowlite.model.User;
+import com.sapient.snowlite.model.UserOperation;
 
 @Repository
 public class SnowliteDAOImpl implements SnowliteDAO{
@@ -107,7 +109,7 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public List<Operation> getOperationsForUser(String userId) {
 		log.info("Fetching supported operations for {}", userId);
-		String sql = "select op.operation_id as operationId, op.operation_name as operationName, op.operation_url as operationUrl "
+		String sql = "select op.operation_id as operationId, op.operation_name as operationName, op.operation_url as operationUrl, op.approval_required as approvalRequired "
 				+ "from SN_OPERATION op, SN_USER_DL sudl, SN_OPERATION_DL_ACCESS oda "
 				+ "where sudl.user_id = ? and sudl.dl_id = oda.dl_id and op.operation_id = oda.operation_id";
 		Object[] params = new Object[] {userId};
@@ -134,7 +136,7 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	public List<Incident> getIncidents(String userId) {
 		log.info("Fetching incidents for {}", userId);
 		String sql = "select incident_id as incidentId, short_description as shortDescription, description, requested_for as requestedFor, environment, "
-				+ "business_service as  businessService, assignment_group as assignmentGroup from SN_INCIDENT where user_id = ?";
+				+ "business_service as  businessService, assignment_group as assignmentGroup, status from SN_INCIDENT where user_id = ?";
 		Object[] params = new Object[] {userId};
 		return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<Incident>(Incident.class));
 	}
@@ -143,8 +145,8 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public void saveIncident(Incident incident) {
 		log.info("Saving incident...");
-		String sql = "insert into sn_incident(short_description, description, requested_for, environment, business_service, assignment_group, user_id) "
-					+ "values (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "insert into sn_incident(short_description, description, requested_for, environment, business_service, assignment_group, user_id, status) "
+					+ "values (?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		Object[] params = new Object[] {
 									incident.getShortDescription(),
@@ -153,9 +155,45 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 									incident.getEnvironment(),
 									incident.getBusinessService(),
 									incident.getAssignmentGroup(),
-									incident.getUser().getUserId()
+									incident.getUser().getUserId(),
+									incident.getStatus()
 									};
 		jdbcTemplate.update(sql, params);
+	}
+
+	@Override
+	public void saveRequest(Request request) {
+		log.info("Saving Request...");
+		String sql = "insert into sn_request(short_description, description, user_id, business_service, assignment_group, requested_resource, approval, approving_manager, status) "
+					+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		Object[] params = new Object[] {
+									request.getShortDescription(),
+									request.getDescription(),
+									request.getUser().getUserId(),
+									request.getBusinessService(),
+									request.getAssignmentGroup(),
+									request.getRequestedResource(),
+									request.isApproval() ? "Y" : "N",
+									request.getApprovingManager(),
+									request.getStatus()
+									};
+		jdbcTemplate.update(sql, params);
+		
+	}
+
+	@Override
+	public void saveUserOperation(UserOperation userOperation) {
+		log.info("Saving user operation...");
+		String sql = "insert into SN_USER_OPERATIONS(operation_id, user_id, access_date)  "
+					+ "values (?, ?, {fn TIMESTAMPADD(SQL_TSI_DAY, -0, CURRENT_TIMESTAMP)})";
+		
+		Object[] params = new Object[] {
+									userOperation.getOperationId(),
+									userOperation.getUserId()
+									};
+		jdbcTemplate.update(sql, params);
+		
 	}
 
 }

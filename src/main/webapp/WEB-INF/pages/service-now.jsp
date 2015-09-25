@@ -365,19 +365,10 @@
 						<table class="table">
 							<tbody>
 								<tr>
-									<td><label>Incident</label></td>
-									<td>
-										<div class="form-group">
-											<select id="brIncident" name="brIncident" class="form-control">
-											</select>
-										</div>
-									</td>
-								</tr>
-								<tr>
 									<td><label>Reason</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="brReason" id="brReason" rows="2" class="form-control"></textarea>
+											<textarea name="brReason" id="brReason" rows="2" class="form-control" onblur="validateBridgeRequest()"></textarea>
 										</div>
 									</td>
 								</tr>
@@ -385,13 +376,13 @@
 									<td><label>Requested People</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="brRequestedPeople" id="brRequestedPeople" rows="2" class="form-control"></textarea>
+											<textarea name="brRequestedPeople" id="brRequestedPeople" rows="2" class="form-control" onblur="validateBridgeRequest()"></textarea>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="brButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="brButton" class="btn btn-primary disabled" onclick="saveBridgeRequest()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -410,7 +401,7 @@
 									<td><label>VPC Name</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="vpcNameAWS" id="vpcNameAWS" class="form-control"/>
+											<input type="text" name="vpcNameAWS" id="vpcNameAWS" class="form-control" onblur="validateAWSNonProdDeploy()"/>
 										</div>
 									</td>
 								</tr>
@@ -418,7 +409,7 @@
 									<td><label>App Stack</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="applicationStackAWS" id="applicationStackAWS" class="form-control"/>
+											<input type="text" name="applicationStackAWS" id="applicationStackAWS" class="form-control" onblur="validateAWSNonProdDeploy()"/>
 										</div>
 									</td>
 								</tr>
@@ -426,13 +417,13 @@
 									<td><label>Path of Archive</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="pathOfArchiveAWS" id="pathOfArchiveAWS" class="form-control"/>
+											<input type="text" name="pathOfArchiveAWS" id="pathOfArchiveAWS" class="form-control" onblur="validateAWSNonProdDeploy()"/>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="awsButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="awsButton" class="btn btn-primary disabled" onclick="saveAWSNonProdDeploy()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -451,7 +442,7 @@
 									<td><label>Unix Id</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="saUnixId" id="saUnixId" class="form-control"/>
+											<input type="text" name="saUnixId" id="saUnixId" class="form-control" onblur="validateSudoAccessRequest()"/>
 										</div>
 									</td>
 								</tr>
@@ -459,13 +450,13 @@
 									<td><label>Admin Group Name</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="saAdminGroup" id="saAdminGroup" class="form-control"/>
+											<input type="text" name="saAdminGroup" id="saAdminGroup" class="form-control" onblur="validateSudoAccessRequest()"/>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="crButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="saButton" class="btn btn-primary disabled" onclick="saveSudoAccessRequest()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -484,7 +475,7 @@
 									<td><label>Description</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="sfDescription" id="sfDescription" rows="2" class="form-control"></textarea>
+											<textarea name="sfDescription" id="sfDescription" rows="2" class="form-control" onblur="validateSharedFolderAccess()"></textarea>
 										</div>
 									</td>
 								</tr>
@@ -502,7 +493,7 @@
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="sfButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="sfButton" class="btn btn-primary disabled" onclick="saveSharedFolderAccess()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -524,7 +515,7 @@
 								</tr>
 								<tr>
 									<td style="text-align:center">
-										<button type="button" id="unixButton" class="btn btn-primary">Submit</button>
+										<button type="button" id="unixButton" class="btn btn-primary" onclick="saveUnixAccountRequest()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -556,7 +547,6 @@
 			</div>
 		</div>
 	</footer>
-	
 </body>
 
 </html>

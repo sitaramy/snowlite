@@ -9,6 +9,7 @@ public final class Operation implements Serializable{
 	private int operationId;
 	private String operationName;
 	private String operationUrl;
+	private String approvalRequired;
 	
 	public Operation(){
 		
@@ -18,6 +19,7 @@ public final class Operation implements Serializable{
 		this.operationId = op.operationId;
 		this.operationName = op.operationName;
 		this.operationUrl = op.operationUrl;
+		this.approvalRequired = op.approvalRequired;
 	}
 	
 	public int getOperationId() {
@@ -38,5 +40,18 @@ public final class Operation implements Serializable{
 	public void setOperationUrl(String operationUrl) {
 		this.operationUrl = operationUrl;
 	}
-	
+
+	public String getApprovalRequired() {
+		return approvalRequired;
+	}
+	public void setApprovalRequired(String approvalRequired) {
+		this.approvalRequired = approvalRequired;
+	}
+	public boolean isApprovalNeeded(){
+		boolean approvalReq = false;
+		if(this.approvalRequired != null && this.approvalRequired.equals("Y")){
+			approvalReq = true;
+		}
+		return approvalReq;
+	}
 }

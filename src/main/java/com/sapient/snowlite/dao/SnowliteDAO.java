@@ -5,7 +5,9 @@ import java.util.List;
 import com.sapient.snowlite.model.BusinessService;
 import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
+import com.sapient.snowlite.model.Request;
 import com.sapient.snowlite.model.User;
+import com.sapient.snowlite.model.UserOperation;
 
 public interface SnowliteDAO {
 
@@ -47,5 +49,17 @@ public interface SnowliteDAO {
 	 * @return
 	 */
 	List<Incident> getIncidents(String userId);
+	
+	/**
+	 * Saves the request
+	 * @param request
+	 */
+	void saveRequest(Request request);
+	
+	/**
+	 * Saves the user operation
+	 * @param request
+	 */
+	void saveUserOperation(UserOperation userOperation);
 	
 }
