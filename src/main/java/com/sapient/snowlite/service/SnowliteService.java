@@ -10,6 +10,7 @@ import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.DBRequest;
 import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
+import com.sapient.snowlite.model.Request;
 import com.sapient.snowlite.model.SnowliteRequest;
 import com.sapient.snowlite.model.User;
 
@@ -83,6 +84,13 @@ public interface SnowliteService {
 	 * @return
 	 */
 	List<Incident> getIncidents(String userId) throws SnowliteException;
+	
+	/**
+	 * Get requests raised by user
+	 * @param userId
+	 * @return
+	 */
+	List<Request> getRequests(String userId) throws SnowliteException;
 	
 	/**
 	 * Saves a request

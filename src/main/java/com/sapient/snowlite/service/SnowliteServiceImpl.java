@@ -85,6 +85,11 @@ public class SnowliteServiceImpl implements SnowliteService {
 	public List<Incident> getIncidents(String userId)  throws SnowliteException{
 		return snowliteDAO.getIncidents(userId);
 	}
+	
+	@Override
+	public List<Request> getRequests(String userId)  throws SnowliteException{
+		return snowliteDAO.getRequests(userId);
+	}
 
 	@Override
 	public void saveIncident(Incident incident)  throws SnowliteException{

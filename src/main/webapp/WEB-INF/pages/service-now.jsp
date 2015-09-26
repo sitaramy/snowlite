@@ -108,8 +108,8 @@
 		                "#sharedFolderAccess", "#unixAccount", "#pendingItems"];
 	
 		function doOnLoad() {
-		  setScreenSize(400,600);
-		  window.onresize = doWindowResize;
+		screenDefault();
+		window.onresize = doWindowResize;
 		  
 		  //hide all the divs
 		  for(var idx = 0; idx < sections.length; idx++){
@@ -211,11 +211,21 @@
 			
 			<!-- My incidents -->
 			<div class="row" id="myIncidents" style="display:none;">
-				<div class="col-xs-12 col-sm-12">			
-					<ul class="nav nav-tabs">
-				    	<li class="active"><a href="#">Requests for Approval</a></li>
-					    <li><a href="#">Incidents</a></li>
-				  </ul>
+				<div class="col-xs-12 col-sm-12">	
+					<table class="table">
+							<tbody>
+								<tr>
+									<th>ID</th>
+									<th>Description</th>
+								</tr>
+								<c:forEach items="${userTasks}" var="task"> 
+									<tr>
+										<td>${task.id}</td>
+										<td>${task.shortDescription}</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+					</table>					
 				</div>
 			</div>
 			

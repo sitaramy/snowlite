@@ -138,10 +138,19 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public List<Incident> getIncidents(String userId) {
 		log.info("Fetching incidents for {}", userId);
-		String sql = "select incident_id as incidentId, short_description as shortDescription, description, requested_for as requestedFor, environment, "
+		String sql = "select incident_id as id, short_description as shortDescription, description, requested_for as requestedFor, environment, "
 				+ "business_service as  businessService, assignment_group as assignmentGroup, status from SN_INCIDENT where user_id = ?";
 		Object[] params = new Object[] {userId};
 		return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<Incident>(Incident.class));
+	}
+	
+	@Override
+	public List<Request> getRequests(String userId) {
+		log.info("Fetching requests for {}", userId);
+		String sql = "select request_id as id, short_description as shortDescription, description, "
+				+ " status from SN_REQUEST where user_id = ?";
+		Object[] params = new Object[] {userId};
+		return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<Request>(Request.class));
 	}
 
 	

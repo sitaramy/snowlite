@@ -23,7 +23,9 @@ import com.sapient.snowlite.model.BusinessService;
 import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
+import com.sapient.snowlite.model.Request;
 import com.sapient.snowlite.model.SnowliteRequest;
+import com.sapient.snowlite.model.Task;
 import com.sapient.snowlite.model.User;
 import com.sapient.snowlite.service.SnowliteService;
 
@@ -63,14 +65,24 @@ public class SnowliteController {
 	
 	@RequestMapping(value = "/getUserIncident", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<Incident> getIncidents(HttpServletRequest request) throws SnowliteException{
+	public List<Task> getIncidents(HttpServletRequest request) throws SnowliteException{
+		List<Task> tasks = new ArrayList<Task>();
 		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
+		
+		logger.info("Fetching service requets for user: {}", loggedInUser.getUserId());
+		List<Request> requests = snowliteService.getRequests(loggedInUser.getUserId());
+		if(requests != null){
+			tasks.addAll(requests);
+		}
+		
 		logger.info("Fetching incidents for user: {}", loggedInUser.getUserId());
 		List<Incident> incidents = snowliteService.getIncidents(loggedInUser.getUserId());
-		if(incidents == null){
-			incidents = new ArrayList<Incident>();
+		if(incidents != null){
+			tasks.addAll(incidents);
 		}
-		return incidents;
+		
+		request.getSession().setAttribute("userTasks", tasks);
+		return tasks;
 	}
 	
 	@SuppressWarnings("unchecked")

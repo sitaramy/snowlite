@@ -1,12 +1,20 @@
 var newLineCharacters = "@@nl@@";
 
-function doWindowResize(){
-  setScreenSize(400,600);
-}
+	function doWindowResize(){
+	  screenDefault();
+	}
 
-function setScreenSize(w,h){
-  window.resizeTo(w,h);
-}
+	function setScreenSize(w,h){
+	  window.resizeTo(w,h);
+	  window.moveTo(screen.width-w, 0);
+	  window.focus();
+	}
+
+	function screenDefault() {
+		var height = screen.height;
+		var width = screen.width;
+		setScreenSize((width/3), height-(height/20));
+	}
 
 function doOperation(selectedSection){
 	

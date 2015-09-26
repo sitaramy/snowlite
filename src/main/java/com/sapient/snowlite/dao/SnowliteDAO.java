@@ -72,6 +72,13 @@ public interface SnowliteDAO {
 	List<Incident> getIncidents(String userId);
 	
 	/**
+	 * Get incidents raised by user
+	 * @param userId
+	 * @return
+	 */
+	List<Request> getRequests(String userId);
+	
+	/**
 	 * Saves the request
 	 * @param request
 	 */
