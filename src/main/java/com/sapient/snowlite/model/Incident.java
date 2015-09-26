@@ -14,6 +14,7 @@ public class Incident implements Serializable{
 	private String businessService;
 	private String assignmentGroup;
 	private User user;
+	private String status;
 	
 	public long getIncidentId() {
 		return incidentId;
@@ -62,6 +63,12 @@ public class Incident implements Serializable{
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

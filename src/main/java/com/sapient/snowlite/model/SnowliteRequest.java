@@ -10,10 +10,15 @@ public class SnowliteRequest implements Serializable{
 
 	private static final long serialVersionUID = -4144668570098189329L;
 	
-	public String requestedFor;
-	public String description;
-	public String businessService;
-	public String environment;
+	private String shortDescription;
+	private String operationId;
+	private String requestedFor;
+	private String description;
+	private String businessService;
+	private String environment;
+	private String requestedResource;
+	private String applicationId;
+	private String releaseId;
 	
 	public String getRequestedFor() {
 		return requestedFor;
@@ -25,6 +30,19 @@ public class SnowliteRequest implements Serializable{
 		return description;
 	}
 	public void setDescription(String description) {
+		if(description != null){
+			String[] descArr = description.split("@@nl@@");
+			StringBuilder builder = new StringBuilder();
+			int index = 0;
+			for(String s : descArr){
+				builder.append(s);
+				if(index < descArr.length - 1){
+					builder.append(System.getProperty("line.separator"));
+				}
+				index++;
+			}
+			description = builder.toString();
+		}
 		this.description = description;
 	}
 	public String getBusinessService() {
@@ -38,6 +56,36 @@ public class SnowliteRequest implements Serializable{
 	}
 	public void setEnvironment(String environment) {
 		this.environment = environment;
+	}
+	public String getOperationId() {
+		return operationId;
+	}
+	public void setOperationId(String operationId) {
+		this.operationId = operationId;
+	}
+	public String getShortDescription() {
+		return shortDescription;
+	}
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+	public String getRequestedResource() {
+		return requestedResource;
+	}
+	public void setRequestedResource(String requestedResource) {
+		this.requestedResource = requestedResource;
+	}
+	public String getApplicationId() {
+		return applicationId;
+	}
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
+	public String getReleaseId() {
+		return releaseId;
+	}
+	public void setReleaseId(String releaseId) {
+		this.releaseId = releaseId;
 	}
 	
 }

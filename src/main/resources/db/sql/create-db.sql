@@ -31,6 +31,15 @@ CREATE TABLE SN_BUSINESS_SVC(
 	assignment_group VARCHAR(100)
 );
 
+-- Application
+DROP TABLE SN_APPLICATION;
+
+CREATE TABLE SN_APPLICATION(
+	application_id INTEGER PRIMARY KEY,
+	application_name VARCHAR(200),
+	application_description VARCHAR(3000)
+);
+
 -- Distribution list
 DROP TABLE SN_DISTRIBUTION_LIST;
 
@@ -53,7 +62,8 @@ DROP TABLE SN_OPERATION;
 CREATE TABLE SN_OPERATION (
   operation_id INTEGER PRIMARY KEY,
   operation_name VARCHAR(30),
-  operation_url  VARCHAR(50)
+  operation_url  VARCHAR(50),
+  approval_required VARCHAR(1)
 );
 
 -- Permitted operations for User
@@ -68,7 +78,7 @@ CREATE TABLE SN_OPERATION_DL_ACCESS (
 DROP TABLE SN_USER_OPERATIONS;
 
 CREATE TABLE SN_USER_OPERATIONS (
-  access_id INTEGER PRIMARY KEY,
+  access_id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1000, INCREMENT BY 1),
   operation_id INTEGER,
   user_id  VARCHAR(10),
   access_date TIMESTAMP
@@ -85,19 +95,47 @@ CREATE TABLE SN_INCIDENT(
 	environment VARCHAR(10),
 	business_service VARCHAR(100),
 	assignment_group VARCHAR(100),
-	user_id VARCHAR(10)
+	user_id VARCHAR(10),
+	status varchar(15)
 );
 
 -- Request
 DROP TABLE SN_REQUEST;
 
 CREATE TABLE SN_REQUEST (
-  request_id INTEGER PRIMARY KEY,
+  request_id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1000, INCREMENT BY 1),
   short_description VARCHAR(1000),
   description  VARCHAR(3000),
   user_id VARCHAR(10),
+  business_service INTEGER,
   assignment_group varchar(100),
   requested_resource varchar(1000),
-  approval char(1),
-  approving_manager varchar(10)
+  approval varchar(1),
+  approving_manager varchar(10),
+  status varchar(15)
+);
+
+-- DB Release
+DROP TABLE SN_DB_RELEASE;
+
+CREATE TABLE SN_DB_RELEASE (
+  release_id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1000, INCREMENT BY 1),
+  description  VARCHAR(3000),
+  user_id VARCHAR(10),
+  assignment_group varchar(100),
+  application INTEGER,
+  status varchar(15)
+);
+
+-- DB Request
+DROP TABLE SN_DB_REQUEST;
+
+CREATE TABLE SN_DB_REQUEST (
+  dbr_id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1000, INCREMENT BY 1),
+  environment VARCHAR(10),
+  release_id INTEGER,
+  description  VARCHAR(3000),
+  user_id VARCHAR(10),
+  assignment_group varchar(100),
+  status varchar(15)
 );

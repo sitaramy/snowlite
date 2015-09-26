@@ -10,10 +10,17 @@ INSERT INTO SN_TEAM VALUES ('FIRST', 'Fixed Income Rapid Solutions', 'Fixed Inco
 INSERT INTO SN_BUSINESS_SVC VALUES (1, 'FIRS Batch Utilities', 'Fixed Income Rapid Solutions');
 INSERT INTO SN_BUSINESS_SVC VALUES (2, 'Active Directory', 'Wintel Support');
 INSERT INTO SN_BUSINESS_SVC VALUES (3, 'Unix Administration', 'Solution Center');
-INSERT INTO SN_BUSINESS_SVC VALUES (4, 'Unix Administration', 'Solution Center');
+INSERT INTO SN_BUSINESS_SVC VALUES (4, 'Production Support', 'Production Support');
 INSERT INTO SN_BUSINESS_SVC VALUES (5, 'Amazon AWS Infrastructure', 'AWS Services');
 INSERT INTO SN_BUSINESS_SVC VALUES (6, 'Virtual Desktop', 'Solution Center');
 INSERT INTO SN_BUSINESS_SVC VALUES (7, 'Database Services', 'Database Operations');
+
+-- Insert Applications
+INSERT INTO SN_APPLICATION VALUES (1, 'Relco', 'Relco');
+INSERT INTO SN_APPLICATION VALUES (2, 'Capital IQ', 'Capital IQ');
+INSERT INTO SN_APPLICATION VALUES (3, 'CRS', 'CRS');
+INSERT INTO SN_APPLICATION VALUES (4, 'APT', 'APT');
+INSERT INTO SN_APPLICATION VALUES (5, 'ABS', 'ABS');
 
 -- Insert Distribution list
 INSERT INTO SN_DISTRIBUTION_LIST VALUES (1, 'Dev');
@@ -27,16 +34,16 @@ INSERT INTO SN_USER_DL VALUES ('syada3', 1);
 INSERT INTO SN_USER_DL VALUES ('hsin46', 3);
 
 -- Insert operations
-INSERT INTO SN_OPERATION VALUES (1, 'My Incidents', 'myIncidents');
-INSERT INTO SN_OPERATION VALUES (2, 'New Incident', 'newIncident');
-INSERT INTO SN_OPERATION VALUES (3, 'New Database Release', 'newDatabaseRelease');
-INSERT INTO SN_OPERATION VALUES (4, 'Create DBR', 'createDBR');
-INSERT INTO SN_OPERATION VALUES (5, 'AWS Non Prod Deploy', 'awsNonProdDeploy');
-INSERT INTO SN_OPERATION VALUES (6, 'Operations Bridge Request', 'bridgeRequest');
-INSERT INTO SN_OPERATION VALUES (7, 'Request New Unix Account', 'unixAccount');
-INSERT INTO SN_OPERATION VALUES (8, 'Sudo Access', 'sudoAccess');
-INSERT INTO SN_OPERATION VALUES (9, 'Access to shared folder', 'sharedFolderAccess');
-INSERT INTO SN_OPERATION VALUES (10, 'Pending Items', 'pendingItems');
+INSERT INTO SN_OPERATION VALUES (1, 'My Incidents', 'myIncidents', 'N');
+INSERT INTO SN_OPERATION VALUES (2, 'New Incident', 'newIncident', 'N');
+INSERT INTO SN_OPERATION VALUES (3, 'New Database Release', 'newDatabaseRelease', 'N');
+INSERT INTO SN_OPERATION VALUES (4, 'Create DBR', 'createDBR', 'N');
+INSERT INTO SN_OPERATION VALUES (5, 'AWS Non Prod Deploy', 'awsNonProdDeploy', 'N');
+INSERT INTO SN_OPERATION VALUES (6, 'Operations Bridge Request', 'bridgeRequest', 'N');
+INSERT INTO SN_OPERATION VALUES (7, 'Request New Unix Account', 'unixAccount', 'Y');
+INSERT INTO SN_OPERATION VALUES (8, 'Sudo Access', 'sudoAccess', 'Y');
+INSERT INTO SN_OPERATION VALUES (9, 'Access to shared folder', 'sharedFolderAccess', 'Y');
+INSERT INTO SN_OPERATION VALUES (10, 'Pending Items', 'pendingItems', 'N');
 
 -- Insert User operation access
 INSERT INTO SN_OPERATION_DL_ACCESS VALUES (1, 1);
@@ -84,23 +91,26 @@ INSERT INTO SN_OPERATION_DL_ACCESS VALUES (9, 4);
 INSERT INTO SN_OPERATION_DL_ACCESS VALUES (10, 3);
 
 -- Insert last few operations performed by the user
-INSERT INTO SN_USER_OPERATIONS VALUES (1, 1, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (2, 2, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (3, 3, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -3, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (4, 3, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -2, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (5, 3, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (1, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (2, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (3, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -3, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (3, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -2, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (3, 'hsin46', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
 
-INSERT INTO SN_USER_OPERATIONS VALUES (6, 1, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (7, 2, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (8, 4, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (9, 4, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (10, 4, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (1, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (2, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (4, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (4, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (4, 'syada3', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
 
-INSERT INTO SN_USER_OPERATIONS VALUES (11, 1, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (12, 2, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (13, 5, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (14, 5, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
-INSERT INTO SN_USER_OPERATIONS VALUES (15, 5, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (1, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (2, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (5, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (5, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
+INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (5, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
 
-
+-- DB Release
+INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 1', 'ssh150', 'IA Database', 2, 'OPEN');
+INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 2', 'hsin46', 'IA Database', 1, 'OPEN');
+INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 3', 'syada3', 'IA Database', 3, 'OPEN');
 

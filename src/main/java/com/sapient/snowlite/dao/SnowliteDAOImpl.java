@@ -13,11 +13,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.DBRelease;
+import com.sapient.snowlite.model.DBRequest;
 import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
+import com.sapient.snowlite.model.Request;
 import com.sapient.snowlite.model.Team;
 import com.sapient.snowlite.model.User;
+import com.sapient.snowlite.model.UserOperation;
 
 @Repository
 public class SnowliteDAOImpl implements SnowliteDAO{
@@ -107,7 +112,7 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public List<Operation> getOperationsForUser(String userId) {
 		log.info("Fetching supported operations for {}", userId);
-		String sql = "select op.operation_id as operationId, op.operation_name as operationName, op.operation_url as operationUrl "
+		String sql = "select op.operation_id as operationId, op.operation_name as operationName, op.operation_url as operationUrl, op.approval_required as approvalRequired "
 				+ "from SN_OPERATION op, SN_USER_DL sudl, SN_OPERATION_DL_ACCESS oda "
 				+ "where sudl.user_id = ? and sudl.dl_id = oda.dl_id and op.operation_id = oda.operation_id";
 		Object[] params = new Object[] {userId};
@@ -134,7 +139,7 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	public List<Incident> getIncidents(String userId) {
 		log.info("Fetching incidents for {}", userId);
 		String sql = "select incident_id as incidentId, short_description as shortDescription, description, requested_for as requestedFor, environment, "
-				+ "business_service as  businessService, assignment_group as assignmentGroup from SN_INCIDENT where user_id = ?";
+				+ "business_service as  businessService, assignment_group as assignmentGroup, status from SN_INCIDENT where user_id = ?";
 		Object[] params = new Object[] {userId};
 		return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<Incident>(Incident.class));
 	}
@@ -143,8 +148,8 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public void saveIncident(Incident incident) {
 		log.info("Saving incident...");
-		String sql = "insert into sn_incident(short_description, description, requested_for, environment, business_service, assignment_group, user_id) "
-					+ "values (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "insert into sn_incident(short_description, description, requested_for, environment, business_service, assignment_group, user_id, status) "
+					+ "values (?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		Object[] params = new Object[] {
 									incident.getShortDescription(),
@@ -153,7 +158,155 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 									incident.getEnvironment(),
 									incident.getBusinessService(),
 									incident.getAssignmentGroup(),
-									incident.getUser().getUserId()
+									incident.getUser().getUserId(),
+									incident.getStatus()
+									};
+		jdbcTemplate.update(sql, params);
+	}
+
+	@Override
+	public void saveRequest(Request request) {
+		log.info("Saving Request...");
+		String sql = "insert into sn_request(short_description, description, user_id, business_service, assignment_group, requested_resource, approval, approving_manager, status) "
+					+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		Object[] params = new Object[] {
+									request.getShortDescription(),
+									request.getDescription(),
+									request.getUser().getUserId(),
+									request.getBusinessService(),
+									request.getAssignmentGroup(),
+									request.getRequestedResource(),
+									request.isApproval() ? "Y" : "N",
+									request.getApprovingManager(),
+									request.getStatus()
+									};
+		jdbcTemplate.update(sql, params);
+		
+	}
+
+	@Override
+	public void saveUserOperation(UserOperation userOperation) {
+		log.info("Saving user operation...");
+		String sql = "insert into SN_USER_OPERATIONS(operation_id, user_id, access_date)  "
+					+ "values (?, ?, {fn TIMESTAMPADD(SQL_TSI_DAY, -0, CURRENT_TIMESTAMP)})";
+		
+		Object[] params = new Object[] {
+									userOperation.getOperationId(),
+									userOperation.getUserId()
+									};
+		jdbcTemplate.update(sql, params);
+		
+	}
+
+	@Override
+	public List<Application> getApplications() {
+		log.info("Fetching all applications...");
+		String sql = "select application_id as applicationId, application_name as applicationName, application_description as description from SN_APPLICATION";
+		return jdbcTemplate.query(sql, new BeanPropertyRowMapper<Application>(Application.class));
+	
+	}
+
+	@Override
+	public List<DBRelease> getDBRelease() {
+		log.info("Fetching database releases...");
+		String sql = "select release_id, description, user_id, assignment_group, application, status from SN_DB_RELEASE where status LIKE 'OPEN'";
+		List<DBRelease> dbReleaseList = jdbcTemplate.query(sql, new RowMapper<DBRelease>(){
+
+			@Override
+			public DBRelease mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				long releaseId = rs.getLong("release_id");
+				String description = rs.getString("description");
+				String userId = rs.getString("user_id");
+				User user = new User();
+				user.setUserId(userId);
+				String assignmentGroup = rs.getString("assignment_group");
+				int applicationId = rs.getInt("application");
+				Application app = new Application();
+				app.setApplicationId(applicationId);
+				String status = rs.getString("status");
+				
+				DBRelease dbRelease = new DBRelease();
+				dbRelease.setApplication(app);
+				dbRelease.setUserId(user);
+				dbRelease.setAssignmentGroup(assignmentGroup);
+				dbRelease.setDescription(description);
+				dbRelease.setReleaseId(releaseId);
+				dbRelease.setStatus(status);
+				return dbRelease;
+				
+			}
+		});
+		
+		return dbReleaseList;
+	}
+
+	@Override
+	public List<DBRequest> getDBRequest(String userId) {
+		log.info("Fetching DB request for {}", userId);
+		String sql = "select dbr_id, environment, release_id, description,  user_id, assignment_group, status from SN_DB_REQUEST where user_Id = ?";
+		Object[] params = new Object[] {userId};
+		List<DBRequest> dbRequestList = jdbcTemplate.query(sql, params, new RowMapper<DBRequest>(){
+
+			@Override
+			public DBRequest mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				long dbrId = rs.getLong("dbr_id");
+				String environment = rs.getString("environment");
+				long releaseId = rs.getLong("release_id");
+				DBRelease rel = new DBRelease();
+				rel.setReleaseId(releaseId);
+				String description = rs.getString("description");
+				String assignmentGroup = rs.getString("assignment_group");
+				String userId = rs.getString("user_id");
+				User user = new User();
+				user.setUserId(userId);
+				String status = rs.getString("status");
+				
+				DBRequest dbRequest = new DBRequest();
+				dbRequest.setDbrId(dbrId);
+				dbRequest.setAssignmentGroup(assignmentGroup);
+				dbRequest.setDescription(description);
+				dbRequest.setEnvironment(environment);
+				dbRequest.setRelease(rel);
+				dbRequest.setUser(user);
+				dbRequest.setStatus(status);
+				return dbRequest;
+				
+			}
+		});
+		return dbRequestList;
+	}
+
+	@Override
+	public void saveDBRelease(DBRelease dbRelease) {
+		log.info("Saving DB Release...");
+		String sql = "INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES (?, ?, ?, ?, ?)";
+		
+		Object[] params = new Object[] {
+									dbRelease.getDescription(),
+									dbRelease.getUserId().getUserId(),
+									dbRelease.getAssignmentGroup(),
+									dbRelease.getApplication().getApplicationId(),
+									dbRelease.getStatus()
+									};
+		jdbcTemplate.update(sql, params);
+		
+	}
+
+	@Override
+	public void saveDBRequest(DBRequest dbRequest) {
+		log.info("Saving DB Request...");
+		String sql = "INSERT INTO SN_DB_REQUEST(environment, release_id, description,  user_id, assignment_group, status) VALUES (?, ?, ?, ?, ?, ?)";
+		
+		Object[] params = new Object[] {
+									dbRequest.getEnvironment(),
+									dbRequest.getRelease().getReleaseId(),
+									dbRequest.getDescription(),
+									dbRequest.getUser().getUserId(),
+									dbRequest.getAssignmentGroup(),
+									dbRequest.getStatus()
 									};
 		jdbcTemplate.update(sql, params);
 	}

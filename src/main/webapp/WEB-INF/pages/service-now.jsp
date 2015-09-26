@@ -287,7 +287,10 @@
 									<td><label>Application</label></td>
 									<td>
 										<div class="form-group">
-											<select id="dbRelApplication" name="dbRelApplication" class="form-control">
+											<select id="dbRelApplication" name="dbRelApplication" class="form-control" onchange="validateDBRelease()">
+												<c:forEach items="${applications}" var="app"> 
+													<option value="${app.applicationId}">${app.applicationName}</option>
+												</c:forEach>
 											</select>
 										</div>
 									</td>
@@ -296,13 +299,13 @@
 									<td><label>Description</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="dbRelDescription" id="dbRelDescription" rows="2" class="form-control"></textarea>
+											<textarea name="dbRelDescription" id="dbRelDescription" rows="2" class="form-control" onblur="validateDBRelease()"></textarea>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button id="newDBRelButton" type="button" class="btn btn-primary disabled">Submit</button>
+										<button id="newDBRelButton" type="button" class="btn btn-primary disabled" onclick="saveDBRelease()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -321,7 +324,10 @@
 									<td><label>Release</label></td>
 									<td>
 										<div class="form-group">
-											<select id="dbrRelease" name="dbrRelease" class="form-control">
+											<select id="dbrRelease" name="dbrRelease" class="form-control" onchange="validateDBRequest()">
+												<c:forEach items="${dbReleases}" var="dbRel"> 
+													<option value="${dbRel.releaseId}">${dbRel.releaseId}</option>
+												</c:forEach>
 											</select>
 										</div>
 									</td>
@@ -329,27 +335,26 @@
 								<tr>
 									<td><label>Environment</label></td>
 									<td>
-										<div class="btn-toolbar">
-											<div class="btn-group">
-									              <button type="button" onclick="populateEnvironment('dbrEnvironment', 'Test')" data-switch-set="dbrEnv" data-switch-value="Test" class="btn btn-default">Test</button>
-									              <button type="button" onclick="populateEnvironment('dbrEnvironment', 'Stage')" data-switch-set="dbrEnv" data-switch-value="Stage" class="btn btn-default">Stage</button>
-									              <button type="button" onclick="populateEnvironment('dbrEnvironment', 'Prod')" data-switch-set="dbrEnv" data-switch-value="Prod" class="btn btn-default">Prod</button>
-								            </div>
+										<div class="form-group">
+											<select id="dbrEnv" name="dbrEnv" class="form-control" onchange="validateDBRequest()">
+												<option value="Test">Test</option>
+												<option value="Stage">Stage</option>
+												<option value="Prod">"Prod"</option>
+											</select>
 										</div>
-										<input type="hidden" id="dbrEnvironment" name="dbrEnvironment"/>
 									</td>
 								</tr>
 								<tr>
 									<td><label>Description</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="dbrDescription" id="dbrDescription" rows="2" class="form-control"></textarea>
+											<textarea name="dbrDescription" id="dbrDescription" rows="2" class="form-control"  onblur="validateDBRequest()"></textarea>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="dbrButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="dbrButton" class="btn btn-primary disabled" onclick="saveDBRequest()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -365,19 +370,10 @@
 						<table class="table">
 							<tbody>
 								<tr>
-									<td><label>Incident</label></td>
-									<td>
-										<div class="form-group">
-											<select id="brIncident" name="brIncident" class="form-control">
-											</select>
-										</div>
-									</td>
-								</tr>
-								<tr>
 									<td><label>Reason</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="brReason" id="brReason" rows="2" class="form-control"></textarea>
+											<textarea name="brReason" id="brReason" rows="2" class="form-control" onblur="validateBridgeRequest()"></textarea>
 										</div>
 									</td>
 								</tr>
@@ -385,13 +381,13 @@
 									<td><label>Requested People</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="brRequestedPeople" id="brRequestedPeople" rows="2" class="form-control"></textarea>
+											<textarea name="brRequestedPeople" id="brRequestedPeople" rows="2" class="form-control" onblur="validateBridgeRequest()"></textarea>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="brButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="brButton" class="btn btn-primary disabled" onclick="saveBridgeRequest()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -410,7 +406,7 @@
 									<td><label>VPC Name</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="vpcNameAWS" id="vpcNameAWS" class="form-control"/>
+											<input type="text" name="vpcNameAWS" id="vpcNameAWS" class="form-control" onblur="validateAWSNonProdDeploy()"/>
 										</div>
 									</td>
 								</tr>
@@ -418,7 +414,7 @@
 									<td><label>App Stack</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="applicationStackAWS" id="applicationStackAWS" class="form-control"/>
+											<input type="text" name="applicationStackAWS" id="applicationStackAWS" class="form-control" onblur="validateAWSNonProdDeploy()"/>
 										</div>
 									</td>
 								</tr>
@@ -426,13 +422,13 @@
 									<td><label>Path of Archive</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="pathOfArchiveAWS" id="pathOfArchiveAWS" class="form-control"/>
+											<input type="text" name="pathOfArchiveAWS" id="pathOfArchiveAWS" class="form-control" onblur="validateAWSNonProdDeploy()"/>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="awsButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="awsButton" class="btn btn-primary disabled" onclick="saveAWSNonProdDeploy()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -451,7 +447,7 @@
 									<td><label>Unix Id</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="saUnixId" id="saUnixId" class="form-control"/>
+											<input type="text" name="saUnixId" id="saUnixId" class="form-control" onblur="validateSudoAccessRequest()"/>
 										</div>
 									</td>
 								</tr>
@@ -459,13 +455,13 @@
 									<td><label>Admin Group Name</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="saAdminGroup" id="saAdminGroup" class="form-control"/>
+											<input type="text" name="saAdminGroup" id="saAdminGroup" class="form-control" onblur="validateSudoAccessRequest()"/>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="crButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="saButton" class="btn btn-primary disabled" onclick="saveSudoAccessRequest()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -484,7 +480,7 @@
 									<td><label>Description</label></td>
 									<td>
 										<div class="form-group">
-											<textarea name="sfDescription" id="sfDescription" rows="2" class="form-control"></textarea>
+											<textarea name="sfDescription" id="sfDescription" rows="2" class="form-control" onblur="validateSharedFolderAccess()"></textarea>
 										</div>
 									</td>
 								</tr>
@@ -502,7 +498,7 @@
 								</tr>
 								<tr>
 									<td colspan="2" style="text-align:center">
-										<button type="button" id="sfButton" class="btn btn-primary disabled">Submit</button>
+										<button type="button" id="sfButton" class="btn btn-primary disabled" onclick="saveSharedFolderAccess()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -524,7 +520,7 @@
 								</tr>
 								<tr>
 									<td style="text-align:center">
-										<button type="button" id="unixButton" class="btn btn-primary">Submit</button>
+										<button type="button" id="unixButton" class="btn btn-primary" onclick="saveUnixAccountRequest()">Submit</button>
 									</td>
 								</tr>
 							</tbody>
@@ -556,7 +552,6 @@
 			</div>
 		</div>
 	</footer>
-	
 </body>
 
 </html>

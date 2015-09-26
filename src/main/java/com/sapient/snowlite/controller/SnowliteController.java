@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.sapient.snowlite.exception.SnowliteException;
+import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
 import com.sapient.snowlite.model.SnowliteRequest;
@@ -33,7 +37,7 @@ public class SnowliteController {
 	private SnowliteService snowliteService;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String home(ModelMap model, HttpServletRequest request) {
+	public String home(ModelMap model, HttpServletRequest request) throws SnowliteException {
 
 		String userId = request.getRemoteUser();
 		
@@ -41,8 +45,13 @@ public class SnowliteController {
 		User loggedInUser = snowliteService.getUserDetails(userId);
 		request.getSession().setAttribute("loggedInUser", loggedInUser);
 		
+		logger.info("Fetching available applications...");
+		List<Application> applications = snowliteService.getApplications();
+		request.getSession().setAttribute("applications", applications);
+		
 		logger.info("Fetching available operations...");
 		Map<String, List<Operation>> operations = snowliteService.getUserOperations(userId);
+		request.getSession().setAttribute("availableOperations", snowliteService.getOperationsForUser(userId));
 		
 		logger.info("Fetching business services...");
 		List<BusinessService> businessServices = snowliteService.getBusinessServices();
@@ -52,8 +61,9 @@ public class SnowliteController {
 		return SNOWLITE_HOME;
 	}
 	
-	@RequestMapping(value = "/getUserIncident", method = RequestMethod.GET)
-	public List<Incident> getIncidents(HttpServletRequest request){
+	@RequestMapping(value = "/getUserIncident", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Incident> getIncidents(HttpServletRequest request) throws SnowliteException{
 		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
 		logger.info("Fetching incidents for user: {}", loggedInUser.getUserId());
 		List<Incident> incidents = snowliteService.getIncidents(loggedInUser.getUserId());
@@ -65,7 +75,7 @@ public class SnowliteController {
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/saveIncident", method = RequestMethod.POST)
-	public @ResponseBody String saveNewIncident(@RequestBody SnowliteRequest snowliteRequest, HttpServletRequest request){
+	public @ResponseBody String saveNewIncident(@RequestBody SnowliteRequest snowliteRequest, HttpServletRequest request) throws SnowliteException{
 		
 		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
 		
@@ -76,6 +86,7 @@ public class SnowliteController {
 		inc.setShortDescription(snowliteRequest.getDescription());
 		inc.setDescription(snowliteRequest.getDescription());
 		inc.setBusinessService(snowliteRequest.getBusinessService());
+		inc.setStatus("OPEN");
 		
 		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
 		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
@@ -86,4 +97,50 @@ public class SnowliteController {
 		return "success";
 	}
 	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/saveRequest", method = RequestMethod.POST)
+	public @ResponseBody String saveNewRequest(@RequestBody SnowliteRequest snowliteRequest, HttpServletRequest request) throws SnowliteException{
+		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
+		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
+		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
+		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
+		List<Operation> operations = (List<Operation>)request.getSession().getAttribute("availableOperations");
+		snowliteService.saveRequest(snowliteRequest, loggedInUser, assignmentGroup, operations);
+		return "success";
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/saveDBRelease", method = RequestMethod.POST)
+	public @ResponseBody String saveNewRelease(@RequestBody SnowliteRequest snowliteRequest, HttpServletRequest request) throws SnowliteException{
+		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
+		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
+		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
+		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
+		List<Operation> operations = (List<Operation>)request.getSession().getAttribute("availableOperations");
+		snowliteService.saveDBRelease(snowliteRequest, loggedInUser, assignmentGroup, operations);
+		return "success";
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/saveDBRequest", method = RequestMethod.POST)
+	public @ResponseBody String saveNewDBRequest(@RequestBody SnowliteRequest snowliteRequest, HttpServletRequest request) throws SnowliteException{
+		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
+		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
+		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
+		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
+		List<Operation> operations = (List<Operation>)request.getSession().getAttribute("availableOperations");
+		snowliteService.saveDBRequest(snowliteRequest, loggedInUser, assignmentGroup, operations);
+		return "success";
+	}
+	
+	@RequestMapping(value = "/getDBReleases", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE, headers="Accept=application/json")
+	@ResponseBody
+	public List<DBRelease> getDBReleases(HttpServletRequest request) throws SnowliteException{
+		logger.info("Fetching available db releases...");
+		List<DBRelease> release = snowliteService.getDBRelease();
+		if(release == null){
+			release = new ArrayList<DBRelease>();
+		}
+		return release;
+	}
 }
