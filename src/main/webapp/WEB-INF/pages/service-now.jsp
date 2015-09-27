@@ -12,24 +12,24 @@
 
     <title>Service Now Lite</title>
 
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	
     <!-- Custom CSS -->
     <link href="css/service-now-lite.css" rel="stylesheet">
-    <link href="css/selectric.css"  rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href="css/bootstrap-select.css" rel="stylesheet">
 	
 	<!-- jQuery -->
     <script src="js/jquery.js"></script>
-    <script src="js/snowlite.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/selectric.js"></script>
-
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	
+	<script src="js/snowlite.js"></script>
+	<script src="js/bootstrap-select.js"></script>
+	
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -43,6 +43,7 @@
 			height: 100%;
 			overflow:hidden; 
 			font-size: 11px;
+			padding: 0px 0px;
 		}
 		
 		footer {
@@ -57,7 +58,7 @@
 		}
 		
 		.content{
-			margin-top: 10px;
+			margin-top: 65px;
 		}
 		
 		.preferred{
@@ -66,6 +67,13 @@
 		
 		.hidden{
 			display:none;
+		}
+		
+		.descriptionStyle{
+			max-width: 70%;
+			overflow: hidden;
+		    text-overflow: ellipsis;
+		    white-space: nowrap;
 		}
 		
 	/*	.navbar-header{
@@ -107,33 +115,28 @@
 		var sections = ["#myIncidents", "#newIncident", "#createDBR", "#bridgeRequest", "#awsNonProdDeploy", "#sudoAccess", "#newDatabaseRelease", 
 		                "#sharedFolderAccess", "#unixAccount", "#pendingItems"];
 	
+		var loggedInUserId = "${loggedInUser.userId}";
+		var loggedInUserName = "${loggedInUser.name}";
+		
 		function doOnLoad() {
-		screenDefault();
-		window.onresize = doWindowResize;
-		  
-		  //hide all the divs
-		  for(var idx = 0; idx < sections.length; idx++){
-			  $(sections[idx]).hide();
-		  }
-		  
-		  //Select my incidents
-		  var snlOptions = $('#snl-option').selectric();
-		  $('#snl-option').val("myIncidents").selectric('refresh');
-		  $("#myIncidents").show();
-		  doOperation("#myIncidents");
-		  
-		  //Dropdown on change
-		  snlOptions.on('change', function() {
-			  console.log("Value selected: " + $(this).val());
-			  var selectedSection = "#" + $(this).val();
-			  console.log("Selected section id: " + selectedSection);
+			screenDefault();
+			window.onresize = doWindowResize;
+			  
+			  //hide all the divs
 			  for(var idx = 0; idx < sections.length; idx++){
 				  $(sections[idx]).hide();
 			  }
-			  $(selectedSection).show();
-			  doOperation(selectedSection);
-		  });
-		  
+			  
+			  //Select my incidents
+			  selectSection('myIncidents', true);
+			  
+			  //Dropdown on change
+			  $('#snl-option').on('change', function() {
+				  console.log("Value selected: " + $(this).val());
+				  var selectedSection = "#" + $(this).val();
+				  selectSection(selectedSection, false);
+			  });
+			  
 		}
 		
 		function populateEnvironment(elementId, value){
@@ -151,34 +154,35 @@
     <!-- Header -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Service Now Lite</a>
-                <div class="pull-right" style="margin-top: 15px; margin-right: 2px;">
-				  	<span style="color:white">${loggedInUser.name}</span>
-			  	</div>
-			  	<div class="clearfix"></div>
-            </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="#">About</a>
-                    </li>
-                    <li>
-                        <a href="#">Services</a>
-                    </li>
-                    <li>
-                        <a href="#">Contact</a>
-                    </li>
-                </ul>
-            </div>
+        	<div class="navbar-header pull-left">
+		         <a class="navbar-brand" href="#" title="Service Now Lite">Service Now Lite</a>
+		    </div>
+		   	<div class="navbar-header pull-right" style="margin-right:10px;">
+		   		<ul class="nav navbar-nav">
+	   				<li style="float: left">
+		   				<a href="#" style="color:white">
+				   			${loggedInUser.preferredName}
+				   		</a>
+		   			</li>
+		   			<li class="dropdown">
+			            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-search"></i></a>
+			            <ul class="dropdown-menu dropdown-menu-right" style="padding:12px;">
+			            	<li>
+				                <form class="form-inline">
+				     				<div class="input-group">
+					                    <input type="text" id="searchTxtBox" class="form-control" placeholder="Search">
+					                    <span class="input-group-btn">
+					                        <button class="btn btn-default" onclick="doSearch()">
+					                        <span class="glyphicon glyphicon-search"></span>
+					                        </button>
+					                    </span>
+					                </div>
+				                </form>
+				              </li>
+			              </ul>
+			        </li>
+		   		</ul>
+		   	</div>
             <!-- /.navbar-collapse -->
         </div>
         <!-- /.container -->
@@ -192,7 +196,7 @@
 				<div class="col-xs-12 col-sm-12">
 					<div class="form-group">
 						<div class="view">
-							<select class="form-control" id="snl-option">
+							<select class="selectpicker form-control" data-live-search="true" id="snl-option" data-style="btn-primary">
 								<optgroup label="Frequently Used">
 									<c:forEach items="${preferredOperations}" var="opr"> 
 										<option class="preferred" value="${opr.operationUrl}">${opr.operationName}</option>
@@ -213,17 +217,14 @@
 			<div class="row" id="myIncidents" style="display:none;">
 				<div class="col-xs-12 col-sm-12">	
 					<table class="table">
-							<tbody>
+							<thead>
 								<tr>
-									<th>ID</th>
+									<th style="width:20%">ID</th>
 									<th>Description</th>
 								</tr>
-								<c:forEach items="${userTasks}" var="task"> 
-									<tr>
-										<td>${task.id}</td>
-										<td>${task.shortDescription}</td>
-									</tr>
-								</c:forEach>
+							</thead>
+							<tbody>
+								
 							</tbody>
 					</table>					
 				</div>
@@ -239,21 +240,20 @@
 									<td><label>Requested For</label></td>
 									<td>
 										<div class="form-group">
-											<input type="text" name="incRequestedFor" id="incRequestedFor" value="${loggedInUser.name}" class="form-control" onblur="validateNewIncident()"/>
+											<select class="selectpicker form-control" data-live-search="true" name="incRequestedFor" data-size="5" id="incRequestedFor" onchange="validateNewIncident()">
+												
+											</select>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td><label>Environment</label></td>
 									<td>
-										<div class="btn-toolbar">
-											<div class="btn-group">
-									              <button type="button" onclick="populateEnvironment('incEnvironment', 'Test')" data-switch-set="incEnv" data-switch-value="Test" class="btn btn-default">Test</button>
-									              <button type="button" onclick="populateEnvironment('incEnvironment', 'Stage')" data-switch-set="incEnv" data-switch-value="Stage" class="btn btn-default">Stage</button>
-									              <button type="button" onclick="populateEnvironment('incEnvironment', 'Prod')" data-switch-set="incEnv" data-switch-value="Prod" class="btn btn-default">Prod</button>
-								            </div>
-										</div>
-										<input type="hidden" id="incEnvironment" name="incEnvironment"/>
+										<select id="incEnvironment" name="incEnvironment" class="form-control" onchange="validateNewIncident()">
+											<option value="Test">Test</option>
+											<option value="Stage">Stage</option>
+											<option value="Prod">Prod</option>
+										</select>
 									</td>
 								</tr>
 								<tr>
@@ -268,7 +268,7 @@
 									<td><label>Business Service</label></td>
 									<td>
 										<div class="form-group">
-											<select id="incBusinessService" name="incBusinessService" class="form-control" onchange="validateNewIncident()">
+											<select id="incBusinessService" name="incBusinessService" class="selectpicker form-control" data-live-search="true" onchange="validateNewIncident()">
 												<c:forEach items="${businessServices}" var="bs"> 
 													<option value="${bs.serviceId}">${bs.serviceName}</option>
 												</c:forEach>
@@ -297,7 +297,7 @@
 									<td><label>Application</label></td>
 									<td>
 										<div class="form-group">
-											<select id="dbRelApplication" name="dbRelApplication" class="form-control" onchange="validateDBRelease()">
+											<select id="dbRelApplication" name="dbRelApplication" data-size="5" class="selectpicker form-control" data-live-search="true" onchange="validateDBRelease()">
 												<c:forEach items="${applications}" var="app"> 
 													<option value="${app.applicationId}">${app.applicationName}</option>
 												</c:forEach>
@@ -334,10 +334,8 @@
 									<td><label>Release</label></td>
 									<td>
 										<div class="form-group">
-											<select id="dbrRelease" name="dbrRelease" class="form-control" onchange="validateDBRequest()">
-												<c:forEach items="${dbReleases}" var="dbRel"> 
-													<option value="${dbRel.releaseId}">${dbRel.releaseId}</option>
-												</c:forEach>
+											<select id="dbrRelease" name="dbrRelease" class="selectpicker form-control" data-size="5" data-live-search="true" onchange="validateDBRequest()">
+											
 											</select>
 										</div>
 									</td>
@@ -346,10 +344,10 @@
 									<td><label>Environment</label></td>
 									<td>
 										<div class="form-group">
-											<select id="dbrEnv" name="dbrEnv" class="form-control" onchange="validateDBRequest()">
+											<select id="dbrEnv" name="dbrEnv" class="selectpicker form-control" data-live-search="true" onchange="validateDBRequest()">
 												<option value="Test">Test</option>
 												<option value="Stage">Stage</option>
-												<option value="Prod">"Prod"</option>
+												<option value="Prod">Prod</option>
 											</select>
 										</div>
 									</td>
@@ -498,7 +496,7 @@
 									<td><label>Access Type</label></td>
 									<td>
 										<div class="form-group">
-											<select id="sfAccessType" name="sfAccessType" class="form-control">
+											<select id="sfAccessType" name="sfAccessType" class="selectpicker form-control" data-live-search="true">
 												<option value="Read">Read</option>
 												<option value="Write">Write</option>
 												<option value="Delete">delete</option>
@@ -543,9 +541,41 @@
 			<div class="row" id="pendingItems" style="display:none;">
 				<div class="col-xs-12 col-sm-12">	
 					<ul class="nav nav-tabs">
-				    	<li class="active"><a href="#">Change Request</a></li>
-					    <li><a href="#">Other Requests</a></li>
-				  </ul>
+						<li class="active"><a data-toggle="tab" href="#changerequest">Change Request</a></li>
+						<li><a data-toggle="tab" href="#otherpendingrequests">Other Requests</a></li>
+					</ul>
+					<div class="tab-content">
+						<div id="changerequest" class="tab-pane fade in active">
+							<table class="table">
+								<thead>
+									<tr>
+										<th style="width:20%">Change ID</th>
+										<th>Short Description</th>
+										<th>Creater</th>
+										<th>Approve/Reject</th>
+									</tr>
+								</thead>
+								<tbody>
+									
+								</tbody>
+							</table>	
+						</div>
+						<div id="otherpendingrequests" class="tab-pane fade">
+							<table class="table">
+								<thead>
+									<tr>
+										<th style="width:20%">ID</th>
+										<th>Short Description</th>
+										<th>Requester</th>
+										<th>Approve/Reject</th>
+									</tr>
+								</thead>
+								<tbody>
+									
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</div>
 			</div>	
 			

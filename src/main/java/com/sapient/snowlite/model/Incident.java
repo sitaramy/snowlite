@@ -10,8 +10,11 @@ public class Incident extends Task implements Serializable {
 	private String environment;
 	private String businessService;
 	private String assignmentGroup;
-	
 
+	public Incident(){
+		setDisplayPrefix("INC");
+	}
+	
 	public String getRequestedFor() {
 		return requestedFor;
 	}
@@ -43,7 +46,7 @@ public class Incident extends Task implements Serializable {
 	public void setAssignmentGroup(String assignmentGroup) {
 		this.assignmentGroup = assignmentGroup;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Incident [requestedFor=" + requestedFor + ", environment="

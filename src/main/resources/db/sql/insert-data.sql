@@ -108,21 +108,21 @@ INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (5, 's
 INSERT INTO SN_USER_OPERATIONS(operation_id, user_id, access_date) VALUES (5, 'ssh150', {fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)});
 
 -- DB Release
-INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 1', 'ssh150', 'IA Database', 2, 'OPEN');
-INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 2', 'hsin46', 'IA Database', 1, 'OPEN');
-INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 3', 'syada3', 'IA Database', 3, 'OPEN');
+INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 1', 'ssh150', 'IA Database', 2, 'Open');
+INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 2', 'hsin46', 'IA Database', 1, 'Open');
+INSERT INTO SN_DB_RELEASE(description, user_id, assignment_group, application, status) VALUES ('Sample 3', 'syada3', 'IA Database', 3, 'Open');
 
 -- Incidents
-INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('IDR test is down','IDR test is down','Sitaram Yadav','Test','IA Database Support','DB Support - Non Prod', 'syada3', 'Open');
-INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('VDI not working','VDI not working','Sitaram Yadav','Prod','VDI Support','Solutions Center','syada3','Open');
-INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('IDR test is down','IDR test is down','Satyam Shandilya','Test','IA Database Support','DB Support - Non Prod', 'ssh150', 'Open');
-INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('VDI not working','VDI not working','Satyam Shandilya','Prod','VDI Support','Solutions Center','ssh150','Open');
-INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('IDR test is down','IDR test is down','Hemant Singh','Test','IA Database Support','DB Support - Non Prod', 'hsin46', 'Open');
-INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('VDI not working','VDI not working','Hemant Singh','Prod','VDI Support','Solutions Center','hsin46','Open');
+INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('IDR test is down','IDR test is down','Sitaram Yadav','Test',7,'Database Operations', 'syada3', 'Open');
+INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('VDI not working','VDI not working','Sitaram Yadav','Prod',6,'Solutions Center','syada3','Open');
+INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('IDR test is down','IDR test is down','Satyam Shandilya','Test',7,'Database Operations', 'ssh150', 'Open');
+INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('VDI not working','VDI not working','Satyam Shandilya','Prod',6,'Solutions Center','ssh150','Open');
+INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('IDR test is down','IDR test is down','Hemant Singh','Test',7,'Database Operations', 'hsin46', 'Open');
+INSERT INTO SN_INCIDENT(short_description,description,requested_for,environment,business_service,assignment_group,user_id,status) VALUES ('VDI not working','VDI not working','Hemant Singh','Prod',6,'Solutions Center','hsin46','Open');
 
 -- Service requests
-insert into SN_REQUEST(short_description,description,user_id,business_service,assignment_group,requested_resource,approval,approving_manager,status) values ('Bridge Request','Open bridge for FIRS job abend','syada3',8,'Solutions center','Tarang Jain','Y','vorab','Open');
-insert into SN_REQUEST(short_description,description,user_id,business_service,assignment_group,requested_resource,approval,approving_manager,status) values ('Bridge Request','Open bridge for FIRS job abend','ssh150',8,'Solutions center','Tarang Jain','Y','vorab','Open');
-insert into SN_REQUEST(short_description,description,user_id,business_service,assignment_group,requested_resource,approval,approving_manager,status) values ('Bridge Request','Open bridge for FIRS job abend','hsin46',8,'Solutions center','Tarang Jain','Y','vorab','Open');
+insert into SN_REQUEST(short_description,description,user_id,business_service,assignment_group,requested_resource,approval,approving_manager,status) values ('Bridge Request','Open bridge for FIRS job abend','syada3',8,'Solutions center','Tarang Jain','N','ssh150','Open');
+insert into SN_REQUEST(short_description,description,user_id,business_service,assignment_group,requested_resource,approval,approving_manager,status) values ('Bridge Request','Open bridge for FIRS job abend','ssh150',8,'Solutions center','Tarang Jain','N','vorab','Open');
+insert into SN_REQUEST(short_description,description,user_id,business_service,assignment_group,requested_resource,approval,approving_manager,status) values ('Bridge Request','Open bridge for FIRS job abend','hsin46',8,'Solutions center','Tarang Jain','N','vorab','Open');
 
 

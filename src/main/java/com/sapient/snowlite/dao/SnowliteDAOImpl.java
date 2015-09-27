@@ -33,6 +33,36 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	private JdbcTemplate jdbcTemplate;
 	
 	@Override
+	public List<User> getUsers() {
+		log.info("Fetching users...");
+		String sql = "select user_id, name, email, team_id from SN_USER";
+		List<User> userList = jdbcTemplate.query(sql, new RowMapper<User>(){
+
+			@Override
+			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				String userId = rs.getString("user_id");
+				String name = rs.getString("name");
+				String email = rs.getString("email");
+				String teamId = rs.getString("team_id");
+				
+				Team team = new Team();
+				team.setTeamId(teamId);
+				
+				User user = new User();
+				user.setUserId(userId);
+				user.setName(name);
+				user.setEmail(email);
+				user.setTeam(team);
+				return user;
+				
+			}
+		});
+		return userList;
+	}
+
+	
+	@Override
 	public User getUserDetails(String userId) {
 		log.info("Fetching user details for {}", userId);
 		String sql = "select user_id, name, email, team_id from SN_USER where user_Id = ?";
@@ -139,21 +169,91 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	public List<Incident> getIncidents(String userId) {
 		log.info("Fetching incidents for {}", userId);
 		String sql = "select incident_id as id, short_description as shortDescription, description, requested_for as requestedFor, environment, "
-				+ "business_service as  businessService, assignment_group as assignmentGroup, status from SN_INCIDENT where user_id = ?";
+				+ "business_service as  businessService, assignment_group as assignmentGroup, status from SN_INCIDENT where user_id = ? and status = 'Open' order by incident_id desc";
 		Object[] params = new Object[] {userId};
 		return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<Incident>(Incident.class));
 	}
 	
 	@Override
+	public Incident getIncident(long incidentId) {
+		log.info("Fetching incident {}", incidentId);
+		Incident incident = null;
+		String sql = "select incident_id as id, short_description as shortDescription, description, requested_for as requestedFor, environment, "
+				+ "business_service as  businessService, assignment_group as assignmentGroup, status from SN_INCIDENT where incident_id = ?";
+		Object[] params = new Object[] {incidentId};
+		List<Incident> incidents = jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<Incident>(Incident.class));
+		if(incidents != null && !incidents.isEmpty()){
+			incident = incidents.get(0);
+		}
+		return incident;
+	}
+	
+	@Override
 	public List<Request> getRequests(String userId) {
 		log.info("Fetching requests for {}", userId);
-		String sql = "select request_id as id, short_description as shortDescription, description, "
-				+ " status from SN_REQUEST where user_id = ?";
+		String sql = "select request_id, short_description, description, business_service, assignment_group, requested_resource, approval, approving_manager, status, user_id"
+				+ " from SN_REQUEST where user_id = ? and status = 'Open' order by request_id desc";
 		Object[] params = new Object[] {userId};
-		return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<Request>(Request.class));
+		return processRequestFetch(sql, params);
+	}
+	
+	@Override
+	public Request getRequest(long requestId) {
+		log.info("Fetching request {}", requestId);
+		Request request = null;
+		String sql = "select request_id, short_description, description, business_service, assignment_group, requested_resource, approval, approving_manager, status, user_id"
+				+ " from SN_REQUEST where request_id = ?";
+		Object[] params = new Object[] {requestId};
+		List<Request> requests = processRequestFetch(sql, params);
+		if(requests != null && !requests.isEmpty()){
+			request = requests.get(0);
+		}
+		return request;
 	}
 
-	
+	/**
+	 * @param sql
+	 * @param params
+	 * @return
+	 */
+	private List<Request> processRequestFetch(String sql, Object[] params) {
+		List<Request> requestList =  jdbcTemplate.query(sql, params, new RowMapper<Request>(){
+			@Override
+			public Request mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				long requestId = rs.getLong("request_id");
+				String shortDescription = rs.getString("short_description");
+				int businessService = rs.getInt("business_service");
+				String description = rs.getString("description");
+				String assignmentGroup = rs.getString("assignment_group");
+				String requestedResource = rs.getString("requested_resource");
+				String approval = rs.getString("approval");
+				String approvingManager = rs.getString("approving_manager");
+				
+				String userId = rs.getString("user_id");
+				User user = new User();
+				user.setUserId(userId);
+				
+				String status = rs.getString("status");
+				
+				Request request = new Request();
+				request.setId(requestId);
+				request.setDescription(description);
+				request.setShortDescription(shortDescription);
+				request.setBusinessService(businessService);
+				request.setAssignmentGroup(assignmentGroup);
+				request.setRequestedResource(requestedResource);
+				request.setApprovingManager(approvingManager);
+				request.setApproval(approval.equals("Y") ? true : false);
+				request.setUser(user);
+				request.setStatus(status);
+				return request;
+				
+			}
+		});
+		return requestList;
+	}
+
 	@Override
 	public void saveIncident(Incident incident) {
 		log.info("Saving incident...");
@@ -211,7 +311,7 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public List<Application> getApplications() {
 		log.info("Fetching all applications...");
-		String sql = "select application_id as applicationId, application_name as applicationName, application_description as description from SN_APPLICATION";
+		String sql = "select application_id as applicationId, application_name as applicationName, application_description as description from SN_APPLICATION order by application_name";
 		return jdbcTemplate.query(sql, new BeanPropertyRowMapper<Application>(Application.class));
 	
 	}
@@ -219,7 +319,7 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public List<DBRelease> getDBRelease() {
 		log.info("Fetching database releases...");
-		String sql = "select release_id, description, user_id, assignment_group, application, status from SN_DB_RELEASE where status LIKE 'OPEN'";
+		String sql = "select release_id, description, user_id, assignment_group, application, status from SN_DB_RELEASE where status LIKE 'Open' order by release_id desc";
 		List<DBRelease> dbReleaseList = jdbcTemplate.query(sql, new RowMapper<DBRelease>(){
 
 			@Override
@@ -254,7 +354,7 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 	@Override
 	public List<DBRequest> getDBRequest(String userId) {
 		log.info("Fetching DB request for {}", userId);
-		String sql = "select dbr_id, environment, release_id, description,  user_id, assignment_group, status from SN_DB_REQUEST where user_Id = ?";
+		String sql = "select dbr_id, environment, release_id, description,  user_id, assignment_group, status from SN_DB_REQUEST where user_Id = ? order by dbr_id desc";
 		Object[] params = new Object[] {userId};
 		List<DBRequest> dbRequestList = jdbcTemplate.query(sql, params, new RowMapper<DBRequest>(){
 
@@ -320,4 +420,37 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 		jdbcTemplate.update(sql, params);
 	}
 
+	@Override
+	public List<Request> getPendingRequests(String type, String userId) {
+		log.info("Fetching pending approval requests for {}", userId);
+		String sql = "select sr.request_id, sr.short_description, su.name from SN_REQUEST sr, SN_USER su "
+				+ " where sr.approving_manager = ? and sr.user_id = su.user_id and sr.status = 'Open' and sr.approval = 'N' order by sr.request_id desc";
+		Object[] params = new Object[] {userId};
+		
+		List<Request> requestList =  jdbcTemplate.query(sql, params, new RowMapper<Request>(){
+			
+			@Override
+			public Request mapRow(ResultSet rs, int rowNum) throws SQLException {
+				long requestId = rs.getLong("request_id");
+				String shortDescription = rs.getString("short_description");
+				User user = new User();
+				user.setName(rs.getString("name"));
+
+				Request request = new Request();
+				request.setId(requestId);
+				request.setShortDescription(shortDescription);
+				request.setUser(user);
+				return request;
+			}
+		});
+		
+		return requestList;
+	}
+
+	@Override
+	public int updateApprovalStatus(String requestid, String status) {
+		String sql = "update SN_REQUEST set approval = ?, status = ? where request_id = ? ";
+		Object[] params = new Object[] {status.trim(), "Y".equals(status.trim())? "Approved" : "Rejected", requestid};
+		return jdbcTemplate.update(sql, params);
+	}
 }

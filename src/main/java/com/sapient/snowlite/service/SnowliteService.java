@@ -13,6 +13,7 @@ import com.sapient.snowlite.model.Operation;
 import com.sapient.snowlite.model.Request;
 import com.sapient.snowlite.model.SnowliteRequest;
 import com.sapient.snowlite.model.User;
+import com.sapient.snowlite.model.UserOperation;
 
 /**
  * Declares methods to be used at service layer
@@ -20,6 +21,12 @@ import com.sapient.snowlite.model.User;
  *
  */
 public interface SnowliteService {
+	
+	/**
+	 * @return
+	 * @throws SnowliteException
+	 */
+	List<User> getUsers() throws SnowliteException;
 	
 	/**
 	 * Get user details
@@ -76,7 +83,7 @@ public interface SnowliteService {
 	 * Save an incident
 	 * @param incident
 	 */
-	void saveIncident(Incident incident) throws SnowliteException;
+	void saveIncident(Incident incident, UserOperation userOperation) throws SnowliteException;
 	
 	/**
 	 * Get incidents raised by user
@@ -86,11 +93,25 @@ public interface SnowliteService {
 	List<Incident> getIncidents(String userId) throws SnowliteException;
 	
 	/**
+	 * get a particular incident
+	 * @param incidentId
+	 * @return
+	 */
+	Incident getIncident(long incidentId) throws SnowliteException;
+	
+	/**
 	 * Get requests raised by user
 	 * @param userId
 	 * @return
 	 */
 	List<Request> getRequests(String userId) throws SnowliteException;
+	
+	/**
+	 * Get a particular request
+	 * @param requestId
+	 * @return
+	 */
+	Request getRequest(long requestId) throws SnowliteException; 
 	
 	/**
 	 * Saves a request
@@ -113,4 +134,19 @@ public interface SnowliteService {
 	 * @param dbRelease
 	 */
 	void saveDBRequest(SnowliteRequest snowliteRequest, User user, String assignmentGroup, List<Operation> operations) throws SnowliteException;
+	
+	/**
+	 * Retrieve the pending approval item for manager 
+	 * @param userId
+	 * @return
+	 */
+	List<Request> getPendingRequests(String type, String userId)  throws SnowliteException;
+
+	/**
+	 * Update the aproval status of the request
+	 * @param requestid
+	 * @param status
+	 * @return
+	 */
+	int updateApprovalStatus(String requestid, String status)  throws SnowliteException;
 }

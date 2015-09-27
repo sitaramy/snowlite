@@ -17,6 +17,7 @@ public class DBRequest implements Serializable{
 	private User user;
 	private String assignmentGroup;
 	private String status;
+	private String displayPrefix = "DBR";
 	
 	public long getDbrId() {
 		return dbrId;
@@ -60,5 +61,10 @@ public class DBRequest implements Serializable{
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
+	public String getDisplayPrefix() {
+		return displayPrefix;
+	}
+	public void setDisplayPrefix(String displayPrefix) {
+		this.displayPrefix = displayPrefix;
+	}
 }

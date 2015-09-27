@@ -93,7 +93,7 @@ CREATE TABLE SN_INCIDENT(
 	description VARCHAR(4000),
 	requested_for VARCHAR(100),
 	environment VARCHAR(10),
-	business_service VARCHAR(100),
+	business_service INTEGER,
 	assignment_group VARCHAR(100),
 	user_id VARCHAR(10),
 	status varchar(15)

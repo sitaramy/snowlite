@@ -15,6 +15,12 @@ import com.sapient.snowlite.model.UserOperation;
 public interface SnowliteDAO {
 
 	/**
+	 * Get users
+	 * @return
+	 */
+	List<User> getUsers();
+	
+	/**
 	 * Get user details
 	 * @return
 	 */
@@ -72,11 +78,25 @@ public interface SnowliteDAO {
 	List<Incident> getIncidents(String userId);
 	
 	/**
+	 * get a particular incident
+	 * @param incidentId
+	 * @return
+	 */
+	Incident getIncident(long incidentId);
+	
+	/**
 	 * Get incidents raised by user
 	 * @param userId
 	 * @return
 	 */
 	List<Request> getRequests(String userId);
+	
+	/**
+	 * Get a particular request
+	 * @param requestId
+	 * @return
+	 */
+	Request getRequest(long requestId); 
 	
 	/**
 	 * Saves the request
@@ -101,5 +121,19 @@ public interface SnowliteDAO {
 	 * @param dbRelease
 	 */
 	void saveDBRequest(DBRequest dbRequest);
+	
+	/**
+	 * @param type
+	 * @param userId
+	 * @return
+	 */
+	List<Request> getPendingRequests(String type, String userId);
+
+	/**
+	 * @param requestid
+	 * @param status
+	 * @return
+	 */
+	int updateApprovalStatus(String requestid, String status);
 	
 }

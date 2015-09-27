@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +28,7 @@ import com.sapient.snowlite.model.Request;
 import com.sapient.snowlite.model.SnowliteRequest;
 import com.sapient.snowlite.model.Task;
 import com.sapient.snowlite.model.User;
+import com.sapient.snowlite.model.UserOperation;
 import com.sapient.snowlite.service.SnowliteService;
 
 @Controller
@@ -63,7 +65,7 @@ public class SnowliteController {
 		return SNOWLITE_HOME;
 	}
 	
-	@RequestMapping(value = "/getUserIncident", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/getUserIncidents", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Task> getIncidents(HttpServletRequest request) throws SnowliteException{
 		List<Task> tasks = new ArrayList<Task>();
@@ -85,6 +87,24 @@ public class SnowliteController {
 		return tasks;
 	}
 	
+	@RequestMapping(value = "/users", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<User> getUsers(HttpServletRequest request) throws SnowliteException{
+		return snowliteService.getUsers();
+	}
+	
+	@RequestMapping(value = "/incident/{identifier}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Incident getIncidents(@PathVariable("identifier") String identifier, HttpServletRequest request) throws SnowliteException{
+		return snowliteService.getIncident(Long.parseLong(identifier));
+	}
+	
+	@RequestMapping(value = "/request/{identifier}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Request getRequest(@PathVariable("identifier") String identifier, HttpServletRequest request) throws SnowliteException{
+		return snowliteService.getRequest(Long.parseLong(identifier));
+	}
+	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/saveIncident", method = RequestMethod.POST)
 	public @ResponseBody String saveNewIncident(@RequestBody SnowliteRequest snowliteRequest, HttpServletRequest request) throws SnowliteException{
@@ -98,14 +118,22 @@ public class SnowliteController {
 		inc.setShortDescription(snowliteRequest.getDescription());
 		inc.setDescription(snowliteRequest.getDescription());
 		inc.setBusinessService(snowliteRequest.getBusinessService());
-		inc.setStatus("OPEN");
+		inc.setStatus("Open");
 		
 		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
 		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
 		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
 		inc.setAssignmentGroup(assignmentGroup);
 		inc.setUser(loggedInUser);
-		snowliteService.saveIncident(inc);
+		
+		String opr = snowliteRequest.getOperationId();
+		List<Operation> operations = (List<Operation>)request.getSession().getAttribute("availableOperations");
+		Operation operation = operations.stream().filter(op -> op.getOperationUrl().equals(opr)).findFirst().get();
+		UserOperation userOperation = new UserOperation();
+		userOperation.setUserId(loggedInUser.getUserId());
+		userOperation.setOperationId(operation.getOperationId());
+		
+		snowliteService.saveIncident(inc, userOperation);
 		return "success";
 	}
 	
@@ -154,5 +182,31 @@ public class SnowliteController {
 			release = new ArrayList<DBRelease>();
 		}
 		return release;
+	}
+	
+	@RequestMapping(value = "/getPendingRequests", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Task> getOtherPendingRequests(HttpServletRequest request) throws SnowliteException{
+		List<Task> tasks = new ArrayList<Task>();
+		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
+		
+		logger.info("Fetching pending approval requets for user: {}", loggedInUser.getUserId());
+		List<Request> requests = snowliteService.getPendingRequests(request.getParameter("type"), loggedInUser.getUserId());
+		if(requests != null){
+			tasks.addAll(requests);
+		}
+		
+		return tasks;
+	}
+	
+	@RequestMapping(value="/updateApprovalStatus", method = RequestMethod.GET)
+	public @ResponseBody String updateApprovalStatus(HttpServletRequest request) throws SnowliteException{
+		
+		int updated = snowliteService.updateApprovalStatus(request.getParameter("requestid"), request.getParameter("status"));
+		
+		if(updated <0) {
+			return "Fail";
+		}
+		return "success";
 	}
 }

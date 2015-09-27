@@ -38,6 +38,12 @@ public class SnowliteServiceImpl implements SnowliteService {
 	private SnowliteDAO snowliteDAO;
 	
 	@Override
+	public List<User> getUsers() throws SnowliteException {
+		return snowliteDAO.getUsers();
+	}
+
+	
+	@Override
 	public User getUserDetails(String userId)  throws SnowliteException{
 		return snowliteDAO.getUserDetails(userId);
 	}
@@ -92,8 +98,9 @@ public class SnowliteServiceImpl implements SnowliteService {
 	}
 
 	@Override
-	public void saveIncident(Incident incident)  throws SnowliteException{
+	public void saveIncident(Incident incident, UserOperation userOperation)  throws SnowliteException{
 		snowliteDAO.saveIncident(incident);
+		snowliteDAO.saveUserOperation(userOperation);
 	}
 
 	@Override
@@ -121,7 +128,7 @@ public class SnowliteServiceImpl implements SnowliteService {
 		}
 		request.setApprovingManager(user.getTeam().getApprovalManager().getUserId());
 		request.setAssignmentGroup(assignmentGroup);
-		request.setStatus("OPEN");
+		request.setStatus("Open");
 		
 		LOG.info("Calling dao to save request...");
 		snowliteDAO.saveRequest(request);
@@ -161,7 +168,7 @@ public class SnowliteServiceImpl implements SnowliteService {
 		DBRelease release = new DBRelease();
 		release.setApplication(app);
 		release.setAssignmentGroup(assignmentGroup);
-		release.setStatus("OPEN");
+		release.setStatus("Open");
 		release.setUserId(user);
 		release.setDescription(snowliteRequest.getDescription());
 		
@@ -190,7 +197,7 @@ public class SnowliteServiceImpl implements SnowliteService {
 		request.setDescription(snowliteRequest.getDescription());
 		request.setEnvironment(snowliteRequest.getEnvironment());
 		request.setRelease(release);
-		request.setStatus("OPEN");
+		request.setStatus("Open");
 		request.setUser(user);
 		
 		LOG.info("Calling dao to save request...");
@@ -199,5 +206,24 @@ public class SnowliteServiceImpl implements SnowliteService {
 		snowliteDAO.saveUserOperation(userOperation);
 	}
 
+	@Override
+	public Incident getIncident(long incidentId) throws SnowliteException {
+		return snowliteDAO.getIncident(incidentId);
+	}
+
+	@Override
+	public Request getRequest(long requestId) throws SnowliteException {
+		return snowliteDAO.getRequest(requestId);
+	}
+	
+	@Override
+	public List<Request> getPendingRequests(String type, String userId) throws SnowliteException{
+		return snowliteDAO.getPendingRequests(type, userId);
+	}
+
+	@Override
+	public int updateApprovalStatus(String requestid, String status) throws SnowliteException{
+		return snowliteDAO.updateApprovalStatus(requestid, status);
+	}
 
 }

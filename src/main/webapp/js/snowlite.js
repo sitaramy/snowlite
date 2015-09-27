@@ -1,20 +1,31 @@
 var newLineCharacters = "@@nl@@";
 
-	function doWindowResize(){
-	  screenDefault();
-	}
+function doWindowResize(){
+  screenDefault();
+}
 
-	function setScreenSize(w,h){
-	  window.resizeTo(w,h);
-	  window.moveTo(screen.width-w, 0);
-	  window.focus();
-	}
+function setScreenSize(w,h){
+  window.resizeTo(w,h);
+  window.moveTo(screen.width-w, 0);
+  window.focus();
+}
 
-	function screenDefault() {
-		var height = screen.height;
-		var width = screen.width;
-		setScreenSize((width/3), height-(height/20));
+function screenDefault() {
+	var height = screen.height;
+	var width = screen.width;
+	setScreenSize((width/3), height-(height/20));
+}
+
+function selectSection(section, doDropdownSelect){
+	console.log("calling select section for " + section + " with dropdownselect as " + doDropdownSelect);
+	if(doDropdownSelect){
+		var sc = section;
+		$('#snl-option').selectpicker('val', sc);
+		section = "#" + section;
 	}
+	show(section);
+	doOperation(section);
+}
 
 function doOperation(selectedSection){
 	
@@ -22,18 +33,92 @@ function doOperation(selectedSection){
 		getIncidents();
 	}
 	
+	else if(selectedSection == "#newIncident"){
+		getUsers();
+	}
+	
 	else if(selectedSection == "#createDBR"){
 		getDBReleases();
+	}
+	
+	else if(selectedSection == "#pendingItems") {
+		getOtherPendingRequests();
 	}
 }
 
 function getIncidents(){
 	$.ajax({
-		url: "/snowlite/getUserIncident",
+		url: "/snowlite/getUserIncidents",
         type: "GET",
         dataType: "json",
         success: function(response) {
-            console.log(response);        
+        	$('#myIncidents tbody').empty();
+        	if(response != null && response != undefined){
+            	for (index = 0; index < response.length; index++) { 
+            		var id = "" + response[index].id;
+            		var prefix = response[index].displayPrefix;
+            		var customId = "" + prefix + id;
+            		var rowContent = "<tr>";
+            		rowContent = rowContent + '<td style="width:20%"><a href="javascript:;" onclick="getTaskDescription(\'' + id + '\', \'' + prefix + '\')">' + customId + '</a></td>';
+            		rowContent = rowContent + '<td>' + response[index].shortDescription + '</td>';
+            		rowContent = rowContent + '</tr>';
+            		$('#myIncidents tbody').append(rowContent);
+            	}
+            }   
+        	
+        }
+    });
+}
+
+function getUsers(){
+	$.ajax({
+		url: "/snowlite/users",
+        type: "GET",
+        dataType: "json",
+        success: function(response) {
+        	if(response != null && response != undefined){
+            	var select = document.getElementById("incRequestedFor");
+            	select.options.length = 0;
+            	for (index = 0; index < response.length; index++) { 
+            		opt = document.createElement("option");
+            		opt.value = response[index].name;
+            		opt.textContent = response[index].name;
+            		select.appendChild(opt);
+            	}
+            	$('#incRequestedFor').selectpicker('refresh');
+            	$('#incRequestedFor').selectpicker('val', loggedInUserName);
+            }  
+        }
+    });
+}
+
+function doSearch(){
+	var searchText = $("searchTxtBox").val();
+	if(searchText == ""){
+		return;
+	}
+	alert("Text entered is: " + searchText);
+	return false;
+}
+
+function getTaskDescription(taskId, taskType){
+	console.log("Fetching task description...");
+	taskType = "" + taskType;
+	var url = "/snowlite/"
+	if(taskType == "REQ"){
+		url = url + "request/";
+	}
+	else{
+		url = url + "incident/";
+	}
+	url = url + taskId;
+	
+	$.ajax({
+		url: url,
+        type: "GET",
+        dataType: "json",
+        success: function(response) {
+            console.log(response); 
         }
     });
 }
@@ -50,9 +135,10 @@ function getDBReleases(){
             	for (index = 0; index < response.length; index++) { 
             		opt = document.createElement("option");
             		opt.value = response[index].releaseId;
-            		opt.textContent = response[index].releaseId;
+            		opt.textContent = "" + response[index].displayPrefix + response[index].releaseId;
             		select.appendChild(opt);
             	}
+            	$('#dbrRelease').selectpicker('refresh');
             }        
         }
     });
@@ -79,11 +165,17 @@ function validateNewIncident(){
 }
 
 function saveNewIncident(){
+	var operation = "newIncident";
 	var incRequestedFor = $("#incRequestedFor").val();
 	var incDescription = $("#incDescription").val();
 	var incEnvironment = $("#incEnvironment").val();
 	var incBusinessService = $("#incBusinessService").val();
-	var json = { "requestedFor" : incRequestedFor, "description" : incDescription, "businessService": incBusinessService, "environment" : incEnvironment};
+	var json = { "requestedFor" : incRequestedFor, 
+					"shortDescription": incDescription, 
+					"description" : incDescription, 
+					"businessService": incBusinessService, 
+					"environment" : incEnvironment,
+					"operationId" : operation};
 	
 	$.ajax({
 		headers: { 
@@ -95,10 +187,8 @@ function saveNewIncident(){
         type: "POST",
         success: function(response) {
             console.log(response);   
-            $("#newIncidentForm").reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            $("#myIncidents").show();
-            doOperation("#myIncidents");
+            $("#newIncidentForm")[0].reset();
+            selectSection('myIncidents', true);
         }
     });
 }
@@ -127,9 +217,7 @@ function saveUnixAccountRequest(){
         success: function(response) {
             console.log(response);   
             $("#unixAccountForm")[0].reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            show("#myIncidents");
-            doOperation("#myIncidents");
+            selectSection('myIncidents', true);
         }
     });
 }
@@ -175,9 +263,7 @@ function saveSudoAccessRequest(){
         success: function(response) {
             console.log(response);   
             $("#sudoAccessForm")[0].reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            show("#myIncidents");
-            doOperation("#myIncidents");
+            selectSection('myIncidents', true);
         }
     });
 }
@@ -221,9 +307,7 @@ function saveSharedFolderAccess(){
         success: function(response) {
             console.log(response);   
             $("#sharedFolderAccessForm")[0].reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            show("#myIncidents");
-            doOperation("#myIncidents");
+            selectSection('myIncidents', true);
         }
     });
 }
@@ -272,9 +356,7 @@ function saveAWSNonProdDeploy(){
         success: function(response) {
             console.log(response);   
             $("#awsDeploymentForm")[0].reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            show("#myIncidents");
-            doOperation("#myIncidents");
+            selectSection('myIncidents', true);
         }
     });
 }
@@ -320,9 +402,7 @@ function saveBridgeRequest(){
         success: function(response) {
             console.log(response);   
             $("#bridgeReqForm")[0].reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            show("#myIncidents");
-            doOperation("#myIncidents");
+            selectSection('myIncidents', true);
         }
     });
 }
@@ -364,9 +444,7 @@ function saveDBRelease(){
         success: function(response) {
             console.log(response);   
             $("#newDBRelForm")[0].reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            show("#myIncidents");
-            doOperation("#myIncidents");
+            selectSection('myIncidents', true);
         }
     });
 }
@@ -411,9 +489,46 @@ function saveDBRequest(){
         success: function(response) {
             console.log(response);   
             $("#newDBRelForm")[0].reset();
-            $('#snl-option').val("myIncidents").selectric('refresh');
-            show("#myIncidents");
-            doOperation("#myIncidents");
+            selectSection('myIncidents', true);
         }
     });
+}
+
+function getOtherPendingRequests(){
+	$.ajax({
+		url: "/snowlite/getPendingRequests?type=others",
+        type: "GET",
+        dataType: "json",
+        success: function(response) {
+        	$('#otherpendingrequests tbody').empty();
+        	if(response != null && response != undefined){
+            	for (index = 0; index < response.length; index++) { 
+            		var id = "" + response[index].id;
+            		var prefix = response[index].displayPrefix;
+            		var customId = "" + prefix + id;
+            		var rowContent = "<tr>";
+            		rowContent = rowContent + '<td>' + customId + '</td>';
+            		rowContent = rowContent + '<td>' + response[index].shortDescription + '</td>';
+            		rowContent = rowContent + '<td>' + response[index].user.name + '</td>';
+            		rowContent = rowContent + '<td style="width:20%;"> <button type="button" onclick="updateOthPendAppvlStatus(\'' + id + '\', \'Y\')" class="btn btn-primary btn-xs btn btn-success"><i class="glyphicon glyphicon-ok"></i></button>  <button type="button" onclick="updateOthPendAppvlStatus(\'' + id + '\', \'N\')" class="btn btn-primary btn-xs btn btn-danger"><i class="glyphicon glyphicon-remove"></i></button></td>';            		
+            		rowContent = rowContent + '</tr>';
+            		$('#otherpendingrequests tbody').append(rowContent);
+            	}
+            }   
+        	
+        }
+    });
+}
+
+function updateOthPendAppvlStatus (id, status) {
+	var _url = "/snowlite/updateApprovalStatus?requestid="+id+"&status="+status;
+	$.ajax({
+	    url: _url,
+	    type: "GET",
+	    dataType: "json",
+	    success: function(response) {
+	        console.log(response);   
+	        getOtherPendingRequests();
+	    }
+	});
 }

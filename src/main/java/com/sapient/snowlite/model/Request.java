@@ -11,7 +11,11 @@ public class Request extends Task implements Serializable {
 	private String requestedResource;
 	private boolean approval;
 	private String approvingManager;
-
+	
+	public Request(){
+		setDisplayPrefix("REQ");
+	}
+	
 	public int getBusinessService() {
 		return businessService;
 	}

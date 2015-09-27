@@ -19,6 +19,7 @@ public class Task implements Serializable {
 	private String description;
 	private User user;
 	private String status;
+	private String displayPrefix;
 
 
 	public String getShortDescription() {
@@ -60,4 +61,13 @@ public class Task implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+	public String getDisplayPrefix() {
+		return displayPrefix;
+	}
+
+	public void setDisplayPrefix(String displayPrefix) {
+		this.displayPrefix = displayPrefix;
+	}
+	
 }
