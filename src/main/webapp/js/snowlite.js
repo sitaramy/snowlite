@@ -13,7 +13,7 @@ function setScreenSize(w,h){
 function screenDefault() {
 	var height = screen.height;
 	var width = screen.width;
-	setScreenSize((width/3), height-(height/20));
+	setScreenSize((width/2.5), height-(height/20));
 }
 
 function selectSection(section, doDropdownSelect){
@@ -45,6 +45,11 @@ function doOperation(selectedSection){
 		getOtherPendingRequests();
 	}
 }
+
+function backToList() {
+	selectSection('myIncidents', true);
+}
+
 
 function getIncidents(){
 	$.ajax({
@@ -118,9 +123,41 @@ function getTaskDescription(taskId, taskType){
         type: "GET",
         dataType: "json",
         success: function(response) {
-            console.log(response); 
+        	console.log(response); 
+        	showTaskDetails(taskType,response);
         }
     });
+}
+
+function showTaskDetails(taskType,response) {
+	if(taskType == "REQ"){
+		show("#reqDetail");
+		document.getElementById("requestId").innerHTML=response.displayPrefix+''+response.id;
+		document.getElementById("requestDesc").innerHTML=response.shortDescription;
+		document.getElementById("requestDtl").innerHTML=response.description;
+		document.getElementById("requestBizSvc").innerHTML=response.businessServiceName;
+		document.getElementById("requestAsGroup").innerHTML=response.assignmentGroup;
+		document.getElementById("requestStatus").innerHTML=response.status;
+		if(response.approval == true) {
+			document.getElementById("requestApproval").innerHTML="Yes";
+			document.getElementById("requestApprovalMgr").innerHTML=response.approvingManager;
+		} else {
+			document.getElementById("requestApproval").innerHTML="N/A";
+			document.getElementById("requestApprovalMgr").innerHTML="N/A";
+		}
+	}
+	else{
+		show("#incidentDetail");
+		document.getElementById("incidentId").innerHTML=response.displayPrefix+''+response.id;
+		document.getElementById("incidentEnv").innerHTML=response.environment;
+		document.getElementById("incidentDesc").innerHTML=response.shortDescription;
+		document.getElementById("incidentDtl").innerHTML=response.description;
+		document.getElementById("incidentReqFor").innerHTML=response.requestedFor;
+		document.getElementById("incidentBizSvc").innerHTML=response.businessService;
+		document.getElementById("incidentAsGroup").innerHTML=response.assignmentGroup;
+		document.getElementById("incidentStatus").innerHTML=response.status;
+	}
+	
 }
 
 function getDBReleases(){

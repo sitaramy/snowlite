@@ -14,6 +14,7 @@ public class DBRelease implements Serializable{
 	private String description;
 	private User userId;
 	private String assignmentGroup;
+	private int assignmentGroupId;
 	private Application application;
 	private String status;
 	private String displayPrefix = "REL";
@@ -59,5 +60,11 @@ public class DBRelease implements Serializable{
 	}
 	public void setDisplayPrefix(String displayPrefix) {
 		this.displayPrefix = displayPrefix;
+	}
+	public int getAssignmentGroupId() {
+		return assignmentGroupId;
+	}
+	public void setAssignmentGroupId(int assignmentGroupId) {
+		this.assignmentGroupId = assignmentGroupId;
 	}
 }

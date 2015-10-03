@@ -7,6 +7,8 @@ public class Request extends Task implements Serializable {
 	private static final long serialVersionUID = -6828277386352318725L;
 
 	private int businessService;
+	private String businessServiceName;
+	private int assignmentGroupId;
 	private String assignmentGroup;
 	private String requestedResource;
 	private boolean approval;
@@ -65,5 +67,21 @@ public class Request extends Task implements Serializable {
 				+ ", getId()=" + getId()
 				+ ", getShortDescription()=" + getShortDescription()
 				+ ", getStatus()=" + getStatus() + "]";
+	}
+
+	public String getBusinessServiceName() {
+		return businessServiceName;
+	}
+
+	public void setBusinessServiceName(String businessServiceName) {
+		this.businessServiceName = businessServiceName;
+	}
+
+	public int getAssignmentGroupId() {
+		return assignmentGroupId;
+	}
+
+	public void setAssignmentGroupId(int assignmentGroupId) {
+		this.assignmentGroupId = assignmentGroupId;
 	}
 }

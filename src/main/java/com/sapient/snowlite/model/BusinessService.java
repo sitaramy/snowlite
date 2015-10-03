@@ -7,6 +7,7 @@ public class BusinessService implements Serializable{
 	
 	private int serviceId;
 	private String serviceName;
+	private int assignmentGroupId;
 	private String assignmentGroup;
 	
 	public int getServiceId() {
@@ -26,6 +27,12 @@ public class BusinessService implements Serializable{
 	}
 	public void setAssignmentGroup(String assignmentGroup) {
 		this.assignmentGroup = assignmentGroup;
+	}
+	public int getAssignmentGroupId() {
+		return assignmentGroupId;
+	}
+	public void setAssignmentGroupId(int assignmentGroupId) {
+		this.assignmentGroupId = assignmentGroupId;
 	}
 	
 }

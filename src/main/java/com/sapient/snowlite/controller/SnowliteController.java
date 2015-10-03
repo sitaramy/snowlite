@@ -122,8 +122,9 @@ public class SnowliteController {
 		
 		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
 		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
-		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
-		inc.setAssignmentGroup(assignmentGroup);
+		BusinessService bizSvc = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get();
+		inc.setAssignmentGroup(bizSvc.getAssignmentGroup());
+		inc.setAssignmentGroupId(bizSvc.getAssignmentGroupId());
 		inc.setUser(loggedInUser);
 		
 		String opr = snowliteRequest.getOperationId();
@@ -143,9 +144,9 @@ public class SnowliteController {
 		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
 		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
 		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
-		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
+		BusinessService bizSvc = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get();
 		List<Operation> operations = (List<Operation>)request.getSession().getAttribute("availableOperations");
-		snowliteService.saveRequest(snowliteRequest, loggedInUser, assignmentGroup, operations);
+		snowliteService.saveRequest(snowliteRequest, loggedInUser, bizSvc, operations);
 		return "success";
 	}
 	
@@ -155,9 +156,9 @@ public class SnowliteController {
 		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
 		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
 		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
-		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
+		BusinessService bizSvc = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get();
 		List<Operation> operations = (List<Operation>)request.getSession().getAttribute("availableOperations");
-		snowliteService.saveDBRelease(snowliteRequest, loggedInUser, assignmentGroup, operations);
+		snowliteService.saveDBRelease(snowliteRequest, loggedInUser, bizSvc, operations);
 		return "success";
 	}
 	
@@ -167,9 +168,9 @@ public class SnowliteController {
 		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
 		int bsId = Integer.parseInt(snowliteRequest.getBusinessService());
 		List<BusinessService> businessServices = (List<BusinessService>)request.getSession().getAttribute("businessServices");
-		String assignmentGroup = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get().getAssignmentGroup();
+		BusinessService bizSvc = businessServices.stream().filter(bs -> bs.getServiceId() == bsId).findFirst().get();
 		List<Operation> operations = (List<Operation>)request.getSession().getAttribute("availableOperations");
-		snowliteService.saveDBRequest(snowliteRequest, loggedInUser, assignmentGroup, operations);
+		snowliteService.saveDBRequest(snowliteRequest, loggedInUser, bizSvc, operations);
 		return "success";
 	}
 	

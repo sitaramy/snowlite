@@ -104,7 +104,7 @@ public class SnowliteServiceImpl implements SnowliteService {
 	}
 
 	@Override
-	public void saveRequest(SnowliteRequest snowliteRequest, User user, String assignmentGroup, List<Operation> operations) throws SnowliteException {
+	public void saveRequest(SnowliteRequest snowliteRequest, User user, BusinessService bizSvc, List<Operation> operations) throws SnowliteException {
 		LOG.info("Processing request...");
 
 		String opr = snowliteRequest.getOperationId();
@@ -127,7 +127,8 @@ public class SnowliteServiceImpl implements SnowliteService {
 			request.setApproval(true);
 		}
 		request.setApprovingManager(user.getTeam().getApprovalManager().getUserId());
-		request.setAssignmentGroup(assignmentGroup);
+		request.setAssignmentGroup(bizSvc.getAssignmentGroup());
+		request.setAssignmentGroupId(bizSvc.getAssignmentGroupId());
 		request.setStatus("Open");
 		
 		LOG.info("Calling dao to save request...");
@@ -153,7 +154,7 @@ public class SnowliteServiceImpl implements SnowliteService {
 
 	@Override
 	public void saveDBRelease(SnowliteRequest snowliteRequest, User user,
-			String assignmentGroup, List<Operation> operations)
+			BusinessService bizSvc, List<Operation> operations)
 			throws SnowliteException {
 		String opr = snowliteRequest.getOperationId();
 		Operation operation = operations.stream().filter(op -> op.getOperationUrl().equals(opr)).findFirst().get();
@@ -167,7 +168,8 @@ public class SnowliteServiceImpl implements SnowliteService {
 		
 		DBRelease release = new DBRelease();
 		release.setApplication(app);
-		release.setAssignmentGroup(assignmentGroup);
+		release.setAssignmentGroup(bizSvc.getAssignmentGroup());
+		release.setAssignmentGroupId(bizSvc.getAssignmentGroupId());
 		release.setStatus("Open");
 		release.setUserId(user);
 		release.setDescription(snowliteRequest.getDescription());
@@ -180,7 +182,7 @@ public class SnowliteServiceImpl implements SnowliteService {
 
 	@Override
 	public void saveDBRequest(SnowliteRequest snowliteRequest, User user,
-			String assignmentGroup, List<Operation> operations)
+			BusinessService bizSvc, List<Operation> operations)
 			throws SnowliteException {
 		String opr = snowliteRequest.getOperationId();
 		Operation operation = operations.stream().filter(op -> op.getOperationUrl().equals(opr)).findFirst().get();
@@ -193,7 +195,8 @@ public class SnowliteServiceImpl implements SnowliteService {
 		release.setReleaseId(Long.parseLong(snowliteRequest.getReleaseId()));
 		
 		DBRequest request = new DBRequest();
-		request.setAssignmentGroup(assignmentGroup);
+		request.setAssignmentGroup(bizSvc.getAssignmentGroup());
+		request.setAssignmentGroupId(bizSvc.getAssignmentGroupId());
 		request.setDescription(snowliteRequest.getDescription());
 		request.setEnvironment(snowliteRequest.getEnvironment());
 		request.setRelease(release);

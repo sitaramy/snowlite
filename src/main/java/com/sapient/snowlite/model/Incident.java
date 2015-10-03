@@ -10,6 +10,7 @@ public class Incident extends Task implements Serializable {
 	private String environment;
 	private String businessService;
 	private String assignmentGroup;
+	private int assignmentGroupId;
 
 	public Incident(){
 		setDisplayPrefix("INC");
@@ -54,6 +55,14 @@ public class Incident extends Task implements Serializable {
 				+ ", assignmentGroup=" + assignmentGroup + ", getId()="
 				+ getId() + ", getShortDescription()="
 				+ getShortDescription() + ", getStatus()=" + getStatus() + "]";
+	}
+
+	public int getAssignmentGroupId() {
+		return assignmentGroupId;
+	}
+
+	public void setAssignmentGroupId(int assignmentGroupId) {
+		this.assignmentGroupId = assignmentGroupId;
 	}
 	
 	

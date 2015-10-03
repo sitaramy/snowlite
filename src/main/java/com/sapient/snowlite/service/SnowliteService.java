@@ -121,19 +121,19 @@ public interface SnowliteService {
 	 * @param operations
 	 * @throws SnowliteException
 	 */
-	void saveRequest(SnowliteRequest snowliteRequest, User user, String assignmentGroup, List<Operation> operations) throws SnowliteException;
+	void saveRequest(SnowliteRequest snowliteRequest, User user, BusinessService bizSvc, List<Operation> operations) throws SnowliteException;
 	
 	/**
 	 * Saves db release
 	 * @param dbRelease
 	 */
-	void saveDBRelease(SnowliteRequest snowliteRequest, User user, String assignmentGroup, List<Operation> operations) throws SnowliteException;
+	void saveDBRelease(SnowliteRequest snowliteRequest, User user, BusinessService bizSvc, List<Operation> operations) throws SnowliteException;
 	
 	/**
 	 * Saves db request
 	 * @param dbRelease
 	 */
-	void saveDBRequest(SnowliteRequest snowliteRequest, User user, String assignmentGroup, List<Operation> operations) throws SnowliteException;
+	void saveDBRequest(SnowliteRequest snowliteRequest, User user, BusinessService bizSvc, List<Operation> operations) throws SnowliteException;
 	
 	/**
 	 * Retrieve the pending approval item for manager 

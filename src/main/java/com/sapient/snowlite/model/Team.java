@@ -12,6 +12,7 @@ public class Team implements Serializable{
 	
 	private String teamId;
 	private String teamName;
+	private String teamDetails;
 	private String teamAssignmentGroup;
 	private User approvalManager;
 	private String teamDL;
@@ -66,5 +67,11 @@ public class Team implements Serializable{
 	}
 	public void setDatabaseAssignmentGroup(String databaseAssignmentGroup) {
 		this.databaseAssignmentGroup = databaseAssignmentGroup;
+	}
+	public String getTeamDetails() {
+		return teamDetails;
+	}
+	public void setTeamDetails(String teamDetails) {
+		this.teamDetails = teamDetails;
 	}
 }

@@ -11,7 +11,8 @@
         http://www.springframework.org/schema/mvc
 		http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-	<import resource="db-derby-config.xml"/> 
+	<!-- <import resource="db-derby-config.xml"/> -->
+	<import resource="db-mysql-config.xml"/>  
 
 	<context:component-scan base-package="com.sapient.snowlite.*" />
 
@@ -25,8 +26,12 @@
 		</property>
 	</bean>
 
-	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" >
+	<!-- <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" >
 		<constructor-arg ref="dataSource" />
+	</bean> -->
+	
+	<bean id="mySQLJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" >
+		<constructor-arg ref="mySQLDataSource" />
 	</bean>
 	
 	<mvc:annotation-driven>

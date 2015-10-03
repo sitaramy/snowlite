@@ -113,7 +113,7 @@
 	<script>
 		
 		var sections = ["#myIncidents", "#newIncident", "#createDBR", "#bridgeRequest", "#awsNonProdDeploy", "#sudoAccess", "#newDatabaseRelease", 
-		                "#sharedFolderAccess", "#unixAccount", "#pendingItems"];
+		                "#sharedFolderAccess", "#unixAccount", "#pendingItems", "#incidentDetail", '#reqDetail'];
 	
 		var loggedInUserId = "${loggedInUser.userId}";
 		var loggedInUserName = "${loggedInUser.name}";
@@ -227,6 +227,126 @@
 								
 							</tbody>
 					</table>					
+				</div>
+			</div>
+			
+			<div class="row" id="incidentDetail" style="display:none;">
+				<div class="col-sm-12">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td colspan="2"><a href="#" onclick="backToList();">Back to Incident/Request List</a></td>
+								</tr>
+								<tr>
+									<td width="20%"><label>Incident ID</label></td>
+									<td>
+										<span id="incidentId"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Enviornment</label></td>
+									<td>
+										<span id="incidentEnv"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Description</label></td>
+									<td>
+										<span id="incidentDesc"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Details</label></td>
+									<td>
+										<span id="incidentDtl"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Requested For</label></td>
+									<td>
+										<span id="incidentReqFor"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Business Service</label></td>
+									<td>
+										<span id="incidentBizSvc"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Assignment Group</label></td>
+									<td>
+										<span id="incidentAsGroup"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Status</label></td>
+									<td>
+										<span id="incidentStatus"></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+				</div>
+			</div>
+			
+			<div class="row" id="reqDetail" style="display:none;">
+				<div class="col-xs-12 col-sm-12">	
+						<table class="table">
+							<tbody>
+								<tr>
+									<td colspan="2"><a href="#" onclick="backToList();">Back to Incident/Request List</a></td>
+								</tr>
+								<tr>
+									<td width="20%"><label>Request ID</label></td>
+									<td>
+										<span id="requestId"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Description</label></td>
+									<td>
+										<span id="requestDesc"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Details</label></td>
+									<td>
+										<span id="requestDtl"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Business Service</label></td>
+									<td>
+										<span id="requestBizSvc"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Assignment Group</label></td>
+									<td>
+										<span id="requestAsGroup"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Status</label></td>
+									<td>
+										<span id="requestStatus"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Approval Req ?</label></td>
+									<td>
+										<span id="requestApproval"></span>
+									</td>
+								</tr>
+								<tr>
+									<td><label>Approval Manager</label></td>
+									<td>
+										<span id="requestApprovalMgr"></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 				</div>
 			</div>
 			
@@ -499,7 +619,7 @@
 											<select id="sfAccessType" name="sfAccessType" class="selectpicker form-control" data-live-search="true">
 												<option value="Read">Read</option>
 												<option value="Write">Write</option>
-												<option value="Delete">delete</option>
+												<option value="Delete">Delete</option>
 											</select>
 										</div>
 									</td>

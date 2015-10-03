@@ -1,5 +1,7 @@
 package com.sapient.snowlite.dao;
 
+import org.springframework.stereotype.Repository;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -11,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
 
 import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
@@ -24,7 +25,7 @@ import com.sapient.snowlite.model.Team;
 import com.sapient.snowlite.model.User;
 import com.sapient.snowlite.model.UserOperation;
 
-@Repository
+//@Repository
 public class SnowliteDAOImpl implements SnowliteDAO{
 
 	private static final Logger log = LoggerFactory.getLogger(SnowliteDAOImpl.class);

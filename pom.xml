@@ -23,6 +23,12 @@
 	<dependencies>
 	
 		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
+	
+		<dependency>
 			<groupId>net.sourceforge.spnego</groupId>
 			<artifactId>spnego</artifactId>
 			<version>${spnego.version}</version>

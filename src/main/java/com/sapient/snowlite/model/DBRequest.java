@@ -16,6 +16,7 @@ public class DBRequest implements Serializable{
 	private String environment;
 	private User user;
 	private String assignmentGroup;
+	private int assignmentGroupId;
 	private String status;
 	private String displayPrefix = "DBR";
 	
@@ -66,5 +67,11 @@ public class DBRequest implements Serializable{
 	}
 	public void setDisplayPrefix(String displayPrefix) {
 		this.displayPrefix = displayPrefix;
+	}
+	public int getAssignmentGroupId() {
+		return assignmentGroupId;
+	}
+	public void setAssignmentGroupId(int assignmentGroupId) {
+		this.assignmentGroupId = assignmentGroupId;
 	}
 }
