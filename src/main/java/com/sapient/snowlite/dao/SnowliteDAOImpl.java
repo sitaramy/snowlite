@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Change;
 import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.DBRequest;
 import com.sapient.snowlite.model.Incident;
@@ -453,5 +454,12 @@ public class SnowliteDAOImpl implements SnowliteDAO{
 		String sql = "update SN_REQUEST set approval = ?, status = ? where request_id = ? ";
 		Object[] params = new Object[] {status.trim(), "Y".equals(status.trim())? "Approved" : "Rejected", requestid};
 		return jdbcTemplate.update(sql, params);
+	}
+
+
+	@Override
+	public List<Change> getChangesForApproval(String userId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

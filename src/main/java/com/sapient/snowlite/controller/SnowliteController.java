@@ -1,6 +1,7 @@
 package com.sapient.snowlite.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.sapient.snowlite.exception.SnowliteException;
 import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Change;
 import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.Incident;
 import com.sapient.snowlite.model.Operation;
@@ -65,7 +67,7 @@ public class SnowliteController {
 		return SNOWLITE_HOME;
 	}
 	
-	@RequestMapping(value = "/getUserIncidents", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/summary", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Task> getIncidents(HttpServletRequest request) throws SnowliteException{
 		List<Task> tasks = new ArrayList<Task>();
@@ -83,7 +85,27 @@ public class SnowliteController {
 			tasks.addAll(incidents);
 		}
 		
-		request.getSession().setAttribute("userTasks", tasks);
+		if(!tasks.isEmpty()){
+			Collections.sort(tasks);
+		}
+		return tasks;
+	}
+	
+	@RequestMapping(value = "/search/{identifier}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Task> getIncidentSummary(@PathVariable("identifier") String identifier, HttpServletRequest request) throws SnowliteException{
+		List<Task> tasks = new ArrayList<Task>();
+		String identifierType = identifier.substring(0, 3);
+		Task searchedTask = null;
+		if(identifierType.equalsIgnoreCase("INC")){
+			searchedTask = snowliteService.getIncident(Long.parseLong(identifier.substring(3)));
+		}
+		else if(identifierType.equalsIgnoreCase("REQ")){
+			searchedTask = snowliteService.getRequest(Long.parseLong(identifier.substring(3)));
+		}
+		if(searchedTask != null){
+			tasks.add(searchedTask);
+		}
 		return tasks;
 	}
 	
@@ -195,6 +217,21 @@ public class SnowliteController {
 		List<Request> requests = snowliteService.getPendingRequests(request.getParameter("type"), loggedInUser.getUserId());
 		if(requests != null){
 			tasks.addAll(requests);
+		}
+		
+		return tasks;
+	}
+	
+	@RequestMapping(value = "/getPendingChangeRequests", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Task> getChangesForApproval(HttpServletRequest request) throws SnowliteException{
+		List<Task> tasks = new ArrayList<Task>();
+		User loggedInUser = (User)request.getSession().getAttribute("loggedInUser");
+		
+		logger.info("Fetching pending approval requets for user: {}", loggedInUser.getUserId());
+		List<Change> changes = snowliteService.getChangesForApproval(loggedInUser.getUserId());
+		if(changes != null){
+			tasks.addAll(changes);
 		}
 		
 		return tasks;

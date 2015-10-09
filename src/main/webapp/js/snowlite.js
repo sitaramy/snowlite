@@ -16,7 +16,7 @@ function screenDefault() {
 	setScreenSize((width/2.5), height-(height/20));
 }
 
-function selectSection(section, doDropdownSelect){
+function selectSection(section, doDropdownSelect, doColorRow){
 	console.log("calling select section for " + section + " with dropdownselect as " + doDropdownSelect);
 	if(doDropdownSelect){
 		var sc = section;
@@ -24,13 +24,13 @@ function selectSection(section, doDropdownSelect){
 		section = "#" + section;
 	}
 	show(section);
-	doOperation(section);
+	doOperation(section, doColorRow);
 }
 
-function doOperation(selectedSection){
+function doOperation(selectedSection, doColorRow){
 	
 	if(selectedSection == "#myIncidents"){
-		getIncidents();
+		getIncidentSummary("", doColorRow);
 	}
 	
 	else if(selectedSection == "#newIncident"){
@@ -42,20 +42,29 @@ function doOperation(selectedSection){
 	}
 	
 	else if(selectedSection == "#pendingItems") {
+		getChangeRequests();
 		getOtherPendingRequests();
 	}
 }
 
 function backToList() {
-	selectSection('myIncidents', true);
+	selectSection('myIncidents', true, false);
 }
 
 
-function getIncidents(){
+function getIncidentSummary(incidentId, doColorFirstRow){
+	
+	var url = "/snowlite/summary";
+	if(incidentId != ""){
+		url = "/snowlite/search/" + incidentId;
+	}
+	
+	
 	$.ajax({
-		url: "/snowlite/getUserIncidents",
+		url: url,
         type: "GET",
         dataType: "json",
+        cache: false,
         success: function(response) {
         	$('#myIncidents tbody').empty();
         	if(response != null && response != undefined){
@@ -63,13 +72,25 @@ function getIncidents(){
             		var id = "" + response[index].id;
             		var prefix = response[index].displayPrefix;
             		var customId = "" + prefix + id;
-            		var rowContent = "<tr>";
+            		
+            		var rowColor = "";
+            		if(doColorFirstRow && index == 0){
+            			rowColor = ' style="background-color: #ccccff;"';
+            		}
+            		
+            		var rowContent = "<tr" + rowColor + ">";
             		rowContent = rowContent + '<td style="width:20%"><a href="javascript:;" onclick="getTaskDescription(\'' + id + '\', \'' + prefix + '\')">' + customId + '</a></td>';
             		rowContent = rowContent + '<td>' + response[index].shortDescription + '</td>';
             		rowContent = rowContent + '</tr>';
             		$('#myIncidents tbody').append(rowContent);
             	}
-            }   
+            } 
+        	else{
+        		var rowContent = "<tr>";
+        		rowContent = rowContent + '<td>No data to display.</td>';
+        		rowContent = rowContent + '</tr>';
+        		$('#myIncidents tbody').append(rowContent);
+        	}
         	
         }
     });
@@ -80,6 +101,7 @@ function getUsers(){
 		url: "/snowlite/users",
         type: "GET",
         dataType: "json",
+        cache: false,
         success: function(response) {
         	if(response != null && response != undefined){
             	var select = document.getElementById("incRequestedFor");
@@ -98,12 +120,11 @@ function getUsers(){
 }
 
 function doSearch(){
-	var searchText = $("searchTxtBox").val();
+	var searchText = $("#searchTxtBox").val();
 	if(searchText == ""){
 		return;
 	}
-	alert("Text entered is: " + searchText);
-	return false;
+	getIncidentSummary(searchText, false);
 }
 
 function getTaskDescription(taskId, taskType){
@@ -122,6 +143,7 @@ function getTaskDescription(taskId, taskType){
 		url: url,
         type: "GET",
         dataType: "json",
+        cache: false,
         success: function(response) {
         	console.log(response); 
         	showTaskDetails(taskType,response);
@@ -165,6 +187,7 @@ function getDBReleases(){
 		url: "/snowlite/getDBReleases",
         type: "GET",
         dataType: "json",
+        cache: false,
         success: function(response) {
             if(response != null && response != undefined){
             	var select = document.getElementById("dbrRelease");
@@ -225,7 +248,7 @@ function saveNewIncident(){
         success: function(response) {
             console.log(response);   
             $("#newIncidentForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
@@ -254,7 +277,7 @@ function saveUnixAccountRequest(){
         success: function(response) {
             console.log(response);   
             $("#unixAccountForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
@@ -300,7 +323,7 @@ function saveSudoAccessRequest(){
         success: function(response) {
             console.log(response);   
             $("#sudoAccessForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
@@ -344,7 +367,7 @@ function saveSharedFolderAccess(){
         success: function(response) {
             console.log(response);   
             $("#sharedFolderAccessForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
@@ -393,7 +416,7 @@ function saveAWSNonProdDeploy(){
         success: function(response) {
             console.log(response);   
             $("#awsDeploymentForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
@@ -439,7 +462,7 @@ function saveBridgeRequest(){
         success: function(response) {
             console.log(response);   
             $("#bridgeReqForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
@@ -481,7 +504,7 @@ function saveDBRelease(){
         success: function(response) {
             console.log(response);   
             $("#newDBRelForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
@@ -526,16 +549,18 @@ function saveDBRequest(){
         success: function(response) {
             console.log(response);   
             $("#newDBRelForm")[0].reset();
-            selectSection('myIncidents', true);
+            selectSection('myIncidents', true, true);
         }
     });
 }
 
 function getOtherPendingRequests(){
+	console.log("Fetching other pending requests...");
 	$.ajax({
 		url: "/snowlite/getPendingRequests?type=others",
         type: "GET",
         dataType: "json",
+        cache: false,
         success: function(response) {
         	$('#otherpendingrequests tbody').empty();
         	if(response != null && response != undefined){
@@ -557,15 +582,48 @@ function getOtherPendingRequests(){
     });
 }
 
+function getChangeRequests(){
+	console.log("Requesting for change requests...");
+	$.ajax({
+		url: "/snowlite/getPendingChangeRequests",
+        type: "GET",
+        dataType: "json",
+        cache: false,
+        success: function(response) {
+        	$('#changerequest tbody').empty();
+        	if(response != null && response != undefined){
+            	for (index = 0; index < response.length; index++) { 
+            		var id = "" + response[index].id;
+            		var prefix = response[index].displayPrefix;
+            		var customId = "" + prefix + id;
+            		var rowContent = "<tr>";
+            		rowContent = rowContent + '<td>' + customId + '</td>';
+            		rowContent = rowContent + '<td>' + response[index].shortDescription + '</td>';
+            		rowContent = rowContent + '<td>' + response[index].user.name + '</td>';
+            		rowContent = rowContent + '<td style="width:20%;"> <button type="button" onclick="updateChangeStatus(\'' + id + '\', \'Y\')" class="btn btn-primary btn-xs btn btn-success"><i class="glyphicon glyphicon-ok"></i></button>  <button type="button" onclick="updateOthPendAppvlStatus(\'' + id + '\', \'N\')" class="btn btn-primary btn-xs btn btn-danger"><i class="glyphicon glyphicon-remove"></i></button></td>';            		
+            		rowContent = rowContent + '</tr>';
+            		$('#changerequest tbody').append(rowContent);
+            	}
+            }   
+        	
+        }
+    });
+}
+
 function updateOthPendAppvlStatus (id, status) {
 	var _url = "/snowlite/updateApprovalStatus?requestid="+id+"&status="+status;
 	$.ajax({
 	    url: _url,
 	    type: "GET",
+	    cache: false,
 	    dataType: "json",
 	    success: function(response) {
 	        console.log(response);   
 	        getOtherPendingRequests();
 	    }
 	});
+}
+
+function updateChangeStatus(id, status){
+	console.log("Updating change status...")
 }

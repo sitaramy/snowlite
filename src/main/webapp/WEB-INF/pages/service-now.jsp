@@ -128,13 +128,13 @@
 			  }
 			  
 			  //Select my incidents
-			  selectSection('myIncidents', true);
+			  selectSection('myIncidents', true, false);
 			  
 			  //Dropdown on change
 			  $('#snl-option').on('change', function() {
 				  console.log("Value selected: " + $(this).val());
 				  var selectedSection = "#" + $(this).val();
-				  selectSection(selectedSection, false);
+				  selectSection(selectedSection, false, false);
 			  });
 			  
 		}
@@ -164,23 +164,6 @@
 				   			${loggedInUser.preferredName}
 				   		</a>
 		   			</li>
-		   			<li class="dropdown">
-			            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-search"></i></a>
-			            <ul class="dropdown-menu dropdown-menu-right" style="padding:12px;">
-			            	<li>
-				                <form class="form-inline">
-				     				<div class="input-group">
-					                    <input type="text" id="searchTxtBox" class="form-control" placeholder="Search">
-					                    <span class="input-group-btn">
-					                        <button class="btn btn-default" onclick="doSearch()">
-					                        <span class="glyphicon glyphicon-search"></span>
-					                        </button>
-					                    </span>
-					                </div>
-				                </form>
-				              </li>
-			              </ul>
-			        </li>
 		   		</ul>
 		   	</div>
             <!-- /.navbar-collapse -->
@@ -216,6 +199,16 @@
 			<!-- My incidents -->
 			<div class="row" id="myIncidents" style="display:none;">
 				<div class="col-xs-12 col-sm-12">	
+    				<div class="input-group">
+	                    <input type="text" id="searchTxtBox" class="form-control" placeholder="Search">
+	                    <span class="input-group-btn">
+	                        <button class="btn btn-default" onclick="doSearch()">
+	                        <span class="glyphicon glyphicon-search"></span>
+	                        </button>
+	                    </span>
+	               	 </div>
+	            </div>   
+				<div class="col-xs-12 col-sm-12">	
 					<table class="table">
 							<thead>
 								<tr>
@@ -235,7 +228,7 @@
 						<table class="table">
 							<tbody>
 								<tr>
-									<td colspan="2"><a href="#" onclick="backToList();">Back to Incident/Request List</a></td>
+									<td colspan="2"><a href="#" onclick="backToList();"><font size="3" class="glyphicon glyphicon-circle-arrow-left"></font></a></td>
 								</tr>
 								<tr>
 									<td width="20%"><label>Incident ID</label></td>
@@ -295,7 +288,7 @@
 						<table class="table">
 							<tbody>
 								<tr>
-									<td colspan="2"><a href="#" onclick="backToList();">Back to Incident/Request List</a></td>
+									<td colspan="2"><a href="#" onclick="backToList();"><font size="3" class="glyphicon glyphicon-circle-arrow-left"></font></a></td>
 								</tr>
 								<tr>
 									<td width="20%"><label>Request ID</label></td>
@@ -662,7 +655,7 @@
 				<div class="col-xs-12 col-sm-12">	
 					<ul class="nav nav-tabs">
 						<li class="active"><a data-toggle="tab" href="#changerequest">Change Request</a></li>
-						<li><a data-toggle="tab" href="#otherpendingrequests">Other Requests</a></li>
+						<li><a data-toggle="tab" href="#otherpendingrequests">Requests</a></li>
 					</ul>
 					<div class="tab-content">
 						<div id="changerequest" class="tab-pane fade in active">

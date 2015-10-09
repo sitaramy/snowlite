@@ -15,6 +15,7 @@ import com.sapient.snowlite.dao.SnowliteDAO;
 import com.sapient.snowlite.exception.SnowliteException;
 import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Change;
 import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.DBRequest;
 import com.sapient.snowlite.model.Incident;
@@ -227,6 +228,13 @@ public class SnowliteServiceImpl implements SnowliteService {
 	@Override
 	public int updateApprovalStatus(String requestid, String status) throws SnowliteException{
 		return snowliteDAO.updateApprovalStatus(requestid, status);
+	}
+
+
+	@Override
+	public List<Change> getChangesForApproval(String userId)
+			throws SnowliteException {
+		return snowliteDAO.getChangesForApproval(userId);
 	}
 
 }

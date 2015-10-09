@@ -2,6 +2,7 @@ package com.sapient.snowlite.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Change;
 import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.DBRequest;
 import com.sapient.snowlite.model.Incident;
@@ -183,12 +185,11 @@ public class SnowliteMySQLDAOImpl implements SnowliteDAO {
 	public List<Incident> getIncidents(String userId) {
 		log.info("Fetching incidents for {}", userId);
 		String sql = "select inc.id as id, inc.short_description as shortDescription, inc.description, inc.requested_for as requestedFor, "
-				+ " inc.env as environment, bs.name as  businessService, ag.name as assignmentGroup,inc.status from incident inc, "
+				+ " inc.env as environment, bs.name as  businessService, ag.name as assignmentGroup,inc.status, inc.created_on as createdOn from incident inc, "
 				+ "business_svc bs, assignment_group ag where inc.assignment_group = ag.id and inc.business_svc = bs.id and bs.assignment_group = ag.id "
 				+ "and inc.user_id = ? and inc.status = 'Open' order by inc.id desc";
 		Object[] params = new Object[] { userId };
-		return mySQLJdbcTemplate.query(sql, params,
-				new BeanPropertyRowMapper<Incident>(Incident.class));
+		return processIncidentFetch(sql, params);
 	}
 
 	@Override
@@ -196,16 +197,60 @@ public class SnowliteMySQLDAOImpl implements SnowliteDAO {
 		log.info("Fetching incident {}", incidentId);
 		Incident incident = null;
 		String sql = "select inc.id as id, inc.short_description as shortDescription, inc.description, inc.requested_for as requestedFor, "
-				+ " inc.env as environment, bs.name as  businessService, ag.name as assignmentGroup,inc.status from incident inc, "
+				+ " inc.env as environment, bs.name as  businessService, ag.name as assignmentGroup,inc.status, inc.created_on as createdOn from incident inc, "
 				+ "business_svc bs, assignment_group ag where inc.assignment_group = ag.id and inc.business_svc = bs.id and bs.assignment_group = ag.id "
 				+ "and inc.id = ?";
 		Object[] params = new Object[] { incidentId };
-		List<Incident> incidents = mySQLJdbcTemplate.query(sql, params,
-				new BeanPropertyRowMapper<Incident>(Incident.class));
+		List<Incident> incidents = processIncidentFetch(sql, params);
 		if (incidents != null && !incidents.isEmpty()) {
 			incident = incidents.get(0);
 		}
 		return incident;
+	}
+	
+	/**
+	 * @param sql
+	 * @param params
+	 * @return
+	 */
+	private List<Incident> processIncidentFetch(String sql, Object[] params) {
+		List<Incident> incidentList = mySQLJdbcTemplate.query(sql, params,
+				new RowMapper<Incident>() {
+					@Override
+					public Incident mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						
+						
+						long requestId = rs.getLong("id");
+						String shortDescription = rs
+								.getString("shortDescription");
+						String businessService = rs
+								.getString("businessService");
+						String description = rs.getString("description");
+						String assignmentGroup = rs
+								.getString("assignmentGroup");
+						String requestedFor = rs
+								.getString("requestedFor");
+						String environment = rs.getString("environment");
+						String status = rs.getString("status");
+						
+						Timestamp createdOnTime = rs.getTimestamp("createdOn");
+						
+						Incident incident = new Incident();
+						incident.setId(requestId);
+						incident.setShortDescription(shortDescription);
+						incident.setAssignmentGroup(assignmentGroup);
+						incident.setRequestedFor(requestedFor);
+						incident.setDescription(description);
+						incident.setStatus(status);
+						incident.setEnvironment(environment);
+						incident.setBusinessService(businessService);
+						incident.setCreatedOn(createdOnTime.toLocalDateTime());
+						return incident;
+
+					}
+				});
+		return incidentList;
 	}
 
 	@Override
@@ -213,7 +258,7 @@ public class SnowliteMySQLDAOImpl implements SnowliteDAO {
 		log.info("Fetching requests for {}", userId);
 		String sql = "select req.id as id, req.short_description as shortDescription, req.description, req.requested_resource, "
 				+ "bs.name as  businessService, ag.name as assignmentGroup, req.user_id, req.approval, req.approval_mgr, "
-				+ "req.status from request req, business_svc bs, assignment_group ag where req.assignment_group = ag.id and req.business_svc =bs.id "
+				+ "req.status,req.created_on as createdOn from request req, business_svc bs, assignment_group ag where req.assignment_group = ag.id and req.business_svc =bs.id "
 				+ "and bs.assignment_group = ag.id and req.user_id = ? and req.status = 'Open' order by req.id desc ";
 		Object[] params = new Object[] { userId };
 		return processRequestFetch(sql, params);
@@ -225,7 +270,7 @@ public class SnowliteMySQLDAOImpl implements SnowliteDAO {
 		Request request = null;
 		String sql = "select req.id as id, req.short_description as shortDescription, req.description, req.requested_resource, "
 				+ "bs.name as  businessService, ag.name as assignmentGroup, req.user_id, req.approval, u.name as approval_mgr, "
-				+ "req.status from request req, business_svc bs, assignment_group ag , user u where req.approval_mgr = u.id and req.assignment_group = ag.id and req.business_svc =bs.id "
+				+ "req.status, req.created_on as createdOn from request req, business_svc bs, assignment_group ag , user u where req.approval_mgr = u.id and req.assignment_group = ag.id and req.business_svc =bs.id "
 				+ "and bs.assignment_group = ag.id and req.id = ? ";
 		Object[] params = new Object[] { requestId };
 		List<Request> requests = processRequestFetch(sql, params);
@@ -265,7 +310,9 @@ public class SnowliteMySQLDAOImpl implements SnowliteDAO {
 						user.setUserId(userId);
 
 						String status = rs.getString("status");
-
+						
+						Timestamp createdOnTime = rs.getTimestamp("createdOn");
+						
 						Request request = new Request();
 						request.setId(requestId);
 						request.setDescription(description);
@@ -277,6 +324,7 @@ public class SnowliteMySQLDAOImpl implements SnowliteDAO {
 						request.setApproval(approval.equals("Y") ? true : false);
 						request.setUser(user);
 						request.setStatus(status);
+						request.setCreatedOn(createdOnTime.toLocalDateTime());
 						return request;
 
 					}
@@ -479,5 +527,35 @@ public class SnowliteMySQLDAOImpl implements SnowliteDAO {
 		Object[] params = new Object[] { status.trim(),
 				"Y".equals(status.trim()) ? "Approved" : "Rejected", requestid };
 		return mySQLJdbcTemplate.update(sql, params);
+	}
+
+	@Override
+	public List<Change> getChangesForApproval(String userId) {
+		log.info("Fetching pending approval requests for {}", userId);
+		String sql = "select sr.id as request_id, sr.short_description, su.name from change_request sr, user su  where sr.approval_mgr = ? "
+				+ " and sr.user_id = su.id and sr.status = 'Open' and sr.approval = 'N' order by sr.id desc";
+		Object[] params = new Object[] { userId };
+
+		List<Change> changeList = mySQLJdbcTemplate.query(sql, params,
+				new RowMapper<Change>() {
+
+					@Override
+					public Change mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						long requestId = rs.getLong("request_id");
+						String shortDescription = rs
+								.getString("short_description");
+						User user = new User();
+						user.setName(rs.getString("name"));
+
+						Change change = new Change();
+						change.setId(requestId);
+						change.setShortDescription(shortDescription);
+						change.setUser(user);
+						return change;
+					}
+				});
+
+		return changeList;
 	}
 }

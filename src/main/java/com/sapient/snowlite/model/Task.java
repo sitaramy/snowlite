@@ -4,12 +4,13 @@
 package com.sapient.snowlite.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author syada3
  *
  */
-public class Task implements Serializable {
+public class Task implements Serializable, Comparable<Task> {
 	/**
 	 * 
 	 */
@@ -20,6 +21,7 @@ public class Task implements Serializable {
 	private User user;
 	private String status;
 	private String displayPrefix;
+	private LocalDateTime createdOn;
 
 
 	public String getShortDescription() {
@@ -68,6 +70,19 @@ public class Task implements Serializable {
 
 	public void setDisplayPrefix(String displayPrefix) {
 		this.displayPrefix = displayPrefix;
+	}
+
+	public LocalDateTime getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(LocalDateTime createdOn) {
+		this.createdOn = createdOn;
+	}
+	
+	@Override
+	public int compareTo(Task o) {
+		return o.getCreatedOn().compareTo(createdOn);
 	}
 	
 }

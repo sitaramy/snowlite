@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Change;
 import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.DBRequest;
 import com.sapient.snowlite.model.Incident;
@@ -128,6 +129,12 @@ public interface SnowliteDAO {
 	 * @return
 	 */
 	List<Request> getPendingRequests(String type, String userId);
+	
+	/**
+	 * @param userId
+	 * @return
+	 */
+	List<Change> getChangesForApproval(String userId);
 
 	/**
 	 * @param requestid

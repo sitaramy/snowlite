@@ -6,6 +6,7 @@ import java.util.Map;
 import com.sapient.snowlite.exception.SnowliteException;
 import com.sapient.snowlite.model.Application;
 import com.sapient.snowlite.model.BusinessService;
+import com.sapient.snowlite.model.Change;
 import com.sapient.snowlite.model.DBRelease;
 import com.sapient.snowlite.model.DBRequest;
 import com.sapient.snowlite.model.Incident;
@@ -141,6 +142,12 @@ public interface SnowliteService {
 	 * @return
 	 */
 	List<Request> getPendingRequests(String type, String userId)  throws SnowliteException;
+	
+	/**
+	 * @param userId
+	 * @return
+	 */
+	List<Change> getChangesForApproval(String userId)  throws SnowliteException;
 
 	/**
 	 * Update the aproval status of the request
